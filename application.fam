@@ -11,7 +11,7 @@ App(
     fap_category="NFC",
     fap_description="Read/write NFC tags for QIDI Box filament system",
     fap_author="flipbox",
-    fap_version="0.1",
+    fap_version="0.1.0",
     sources=[
         "flipbox.c",
         "qidi_tag.c",

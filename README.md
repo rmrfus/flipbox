@@ -80,20 +80,20 @@ Auth keys tried in order:
 
 | Group | Materials |
 |---|---|
-| PLA | PLA, PLA+, PLA Matte, PLA Silk, PLA CF, PLA Wood, PLA-GF, PLA Metal |
-| ABS | ABS, ABS+, ABS CF, ABS GF |
-| ASA | ASA, ASA CF |
-| PA / Nylon | PA, PA-CF, PA-GF, PA6-CF, PA12-CF, PAHT-CF |
-| PET / PETG | PETG, PETG-CF, PETG Metal, PETG Silk, PETG+, PET-CF, PCTG |
-| Support | PVA, HIPS |
-| TPU | TPU, TPU-HF |
-| Other | PC, BVOH, PP |
+| PLA | PLA Rapido, PLA Matte, PLA Metal, PLA Silk, PLA-CF, PLA-Wood, PLA Basic, PLA Matte Basic |
+| ABS | ABS, ABS-GF, ABS-Metal, ABS-Odorless |
+| ASA | ASA, ASA-AERO |
+| PA / Nylon | UltraPA, PA-CF, UltraPA-CF25, PA12-CF, PAHT-CF, PAHT-GF |
+| PET / PETG | PET-CF, PET-GF, PETG Basic, PETG Tough, PETG Rapido, PETG-CF, PETG-GF, PETG Translucent |
+| Support | Support For PAHT, Support For PET/PA |
+| TPU | TPU-Aero, TPU |
+| Other | PC/ABS-FR, PPS-CF, PVA |
 
 ### Colors (24)
 
-White, Black, Red, Blue, Green, Yellow, Orange, Purple, Pink, Grey, Brown, Beige,
-Gold, Silver, Cyan, Transparent, Skin, Sky Blue, Army Green, Dark Blue, Dark Red,
-Dark Green, Ocean Blue, Multicolor.
+White, Black, Light Gray, Lime Green, Mint Green, Blue, Pink, Yellow, Dark Green,
+Light Blue, Dark Blue, Lavender, Yellow-Green, Ocean Blue, Sky Blue, Purple,
+Light Red, Red, Beige, Gray, Brown, Tan, Orange, Bronze.
 
 ## References
 

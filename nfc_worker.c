@@ -121,6 +121,7 @@ NfcWorker* nfc_worker_alloc(void) {
 
 void nfc_worker_free(NfcWorker* w) {
     furi_assert(w);
+    furi_assert(w->state == WorkerStateStop); // nfc_worker_stop() must be called first
     furi_thread_free(w->thread);
     nfc_free(w->nfc);
     free(w);
