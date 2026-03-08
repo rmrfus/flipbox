@@ -1,0 +1,8 @@
+.ufbt/
+.venv/
+dist/
+dist/
+*.o
+*.d
+*.elf
+*.fap
