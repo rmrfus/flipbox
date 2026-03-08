@@ -30,9 +30,18 @@ Works with any MIFARE Classic 1K spool tag (FM11RF08S or compatible).
 
 ## Install
 
-**Download:** grab `flipbox.fap` from [Releases](https://github.com/rmrfus/flipbox/releases) and copy to `SD:/apps/NFC/` via [qFlipper](https://flipperzero.one/update) or USB mass storage (`Settings → USB → Mass Storage` on the Flipper).
+Download `flipbox.fap` from [Releases](https://github.com/rmrfus/flipbox/releases) and copy it to `SD:/apps/NFC/` on the Flipper's SD card.
 
-**Build from source** (requires [ufbt](https://github.com/flipperdevices/flipperzero-ufbt) and [direnv](https://direnv.net/)):
+Two ways to copy:
+
+- **qFlipper** — connect Flipper via USB, open [qFlipper](https://flipperzero.one/update), go to SD card browser → `apps/NFC/`, drag the file in
+- **USB mass storage** — on the Flipper: `Settings → USB → Mass Storage`, then mount as a flash drive and copy manually
+
+The app will appear in `Apps → NFC → FlipBox`.
+
+## Build from source
+
+Requires [ufbt](https://github.com/flipperdevices/flipperzero-ufbt) and [direnv](https://direnv.net/).
 
 ```zsh
 git clone https://github.com/rmrfus/flipbox
@@ -42,7 +51,7 @@ direnv allow
 # just build → dist/flipbox.fap
 direnv exec . ufbt
 
-# or build + deploy + launch over USB
+# or build + deploy + launch over USB serial
 direnv exec . ufbt launch
 ```
 
