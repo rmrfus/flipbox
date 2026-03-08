@@ -2,6 +2,16 @@
 
 Flipper Zero app for reading and writing NFC tags used by the [QIDI Box](https://wiki.qidi3d.com/en/QIDIBOX/RFID) filament management system.
 
+## Screenshots
+
+| Menu | Read result | Write config |
+|------|-------------|--------------|
+| ![Menu](screenshots/01-menu.jpg) | ![Read result](screenshots/02-read-result.jpg) | ![Write config](screenshots/03-write-cfg.jpg) |
+
+| Material picker | Color picker | Write success |
+|-----------------|--------------|---------------|
+| ![Material picker](screenshots/04-material-picker.jpg) | ![Color picker](screenshots/05-color-picker.jpg) | ![Write success](screenshots/06-write-success.jpg) |
+
 ## What it does
 
 - **Read** — hold the Flipper near a QIDI Box spool tag and see material, color, and manufacturer
