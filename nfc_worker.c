@@ -2,117 +2,126 @@
 
 #include <furi.h>
 #include <lib/nfc/nfc.h>
-#include <lib/nfc/nfc_poller.h>
 #include <lib/nfc/protocols/mf_classic/mf_classic.h>
-#include <lib/nfc/protocols/mf_classic/mf_classic_poller.h>
+#include <lib/nfc/protocols/mf_classic/mf_classic_poller_sync.h>
 
-#define TAG "FlipBox_NFC"
+#define TAG        "FlipBox_NFC"
+#define STACK_SIZE (2 * 1024)
+#define POLL_MS    150
 
 typedef enum {
-    WorkerOpRead,
-    WorkerOpWrite,
-} WorkerOp;
+    WorkerStateIdle,
+    WorkerStateRead,
+    WorkerStateWrite,
+    WorkerStateStop,
+} WorkerState;
 
 struct NfcWorker {
-    Nfc*              nfc;
-    NfcPoller*        poller;
-    NfcWorkerCallback cb;
-    void*             cb_ctx;
-    WorkerOp          op;
-    QidiTagData       write_data;
+    FuriThread*          thread;
+    Nfc*                 nfc;
+    volatile WorkerState state;
+    NfcWorkerCallback    cb;
+    void*                cb_ctx;
+    QidiTagData          write_data;
 };
 
-// Runs in NFC stack context. On RequestMode we do auth+read/write ourselves,
-// then stop the poller. No FuriThread needed.
-static NfcCommand worker_poller_cb(NfcGenericEvent event, void* context) {
-    NfcWorker* w = context;
-
-    if(event.protocol != NfcProtocolMfClassic) {
-        return NfcCommandStop;
-    }
-
-    MfClassicPollerEvent* mfc_event = event.event_data;
-
-    // Only act at RequestMode — card is detected and activated, crypto not yet started.
-    // Auth + read/write right here, then stop the poller.
-    if(mfc_event->type != MfClassicPollerEventTypeRequestMode) {
-        return NfcCommandContinue;
-    }
-
-    MfClassicPoller* mfc = event.instance;
+static bool do_read(Nfc* nfc, QidiTagData* out) {
+    MfClassicBlock block = {0};
     MfClassicKey key = {0};
-    MfClassicAuthContext auth_ctx = {0};
     MfClassicError err;
-    NfcWorkerResult result = {0};
 
-    // Try primary key D3:F7:D3:F7:D3:F7, then factory default FF:FF:FF:FF:FF:FF
     memcpy(key.data, QIDI_KEY_PRIMARY, 6);
-    err = mf_classic_poller_auth(mfc, QIDI_ABSOLUTE_BLOCK, &key, MfClassicKeyTypeA, &auth_ctx, false);
+    err = mf_classic_poller_sync_read_block(nfc, QIDI_ABSOLUTE_BLOCK, &key, MfClassicKeyTypeA, &block);
     if(err != MfClassicErrorNone) {
         memcpy(key.data, QIDI_KEY_DEFAULT, 6);
-        err = mf_classic_poller_auth(mfc, QIDI_ABSOLUTE_BLOCK, &key, MfClassicKeyTypeA, &auth_ctx, false);
+        err = mf_classic_poller_sync_read_block(nfc, QIDI_ABSOLUTE_BLOCK, &key, MfClassicKeyTypeA, &block);
     }
 
-    if(err != MfClassicErrorNone) {
-        FURI_LOG_E(TAG, "Auth failed: %d", err);
-        result.event = (w->op == WorkerOpRead) ? NfcWorkerEventReadFail : NfcWorkerEventWriteFail;
-        goto done;
+    if(err == MfClassicErrorNone) {
+        out->material_code     = block.data[0];
+        out->color_code        = block.data[1];
+        out->manufacturer_code = block.data[2];
+        FURI_LOG_I(TAG, "Read OK: mat=0x%02X col=0x%02X mfr=0x%02X",
+            out->material_code, out->color_code, out->manufacturer_code);
+        return true;
     }
 
-    if(w->op == WorkerOpRead) {
-        MfClassicBlock block = {0};
-        err = mf_classic_poller_read_block(mfc, QIDI_ABSOLUTE_BLOCK, &block);
-        if(err == MfClassicErrorNone) {
-            result.event                      = NfcWorkerEventReadSuccess;
-            result.tag_data.material_code     = block.data[0];
-            result.tag_data.color_code        = block.data[1];
-            result.tag_data.manufacturer_code = block.data[2];
-            FURI_LOG_I(TAG, "Read OK: mat=0x%02X col=0x%02X mfr=0x%02X",
-                result.tag_data.material_code,
-                result.tag_data.color_code,
-                result.tag_data.manufacturer_code);
-        } else {
-            FURI_LOG_E(TAG, "Read block failed: %d", err);
-            result.event = NfcWorkerEventReadFail;
-        }
-    } else {
-        MfClassicBlock block = {0};
-        block.data[0] = w->write_data.material_code;
-        block.data[1] = w->write_data.color_code;
-        block.data[2] = w->write_data.manufacturer_code;
-        err = mf_classic_poller_write_block(mfc, QIDI_ABSOLUTE_BLOCK, &block);
-        if(err == MfClassicErrorNone) {
-            FURI_LOG_I(TAG, "Write OK");
-            result.event = NfcWorkerEventWriteSuccess;
-        } else {
-            FURI_LOG_E(TAG, "Write block failed: %d", err);
-            result.event = NfcWorkerEventWriteFail;
-        }
-    }
-
-done:
-    if(w->cb) w->cb(result, w->cb_ctx);
-    return NfcCommandStop;
+    FURI_LOG_E(TAG, "Read failed: err=%d", err);
+    return false;
 }
 
-static void worker_stop_poller(NfcWorker* w) {
-    if(w->poller) {
-        nfc_poller_stop(w->poller);
-        nfc_poller_free(w->poller);
-        w->poller = NULL;
+static bool do_write(Nfc* nfc, const QidiTagData* data) {
+    MfClassicBlock block = {0};
+    block.data[0] = data->material_code;
+    block.data[1] = data->color_code;
+    block.data[2] = data->manufacturer_code;
+
+    MfClassicKey key = {0};
+    MfClassicError err;
+
+    memcpy(key.data, QIDI_KEY_PRIMARY, 6);
+    err = mf_classic_poller_sync_write_block(nfc, QIDI_ABSOLUTE_BLOCK, &key, MfClassicKeyTypeA, &block);
+    if(err != MfClassicErrorNone) {
+        memcpy(key.data, QIDI_KEY_DEFAULT, 6);
+        err = mf_classic_poller_sync_write_block(nfc, QIDI_ABSOLUTE_BLOCK, &key, MfClassicKeyTypeA, &block);
     }
+
+    if(err == MfClassicErrorNone) {
+        FURI_LOG_I(TAG, "Write OK: mat=0x%02X col=0x%02X mfr=0x%02X",
+            data->material_code, data->color_code, data->manufacturer_code);
+        return true;
+    }
+
+    FURI_LOG_E(TAG, "Write failed: err=%d", err);
+    return false;
+}
+
+static int32_t worker_thread(void* arg) {
+    NfcWorker* w = arg;
+
+    while(w->state != WorkerStateStop) {
+        WorkerState cur = w->state;
+
+        if(cur == WorkerStateRead) {
+            QidiTagData result = {0};
+            bool ok = do_read(w->nfc, &result);
+            if(w->state != WorkerStateStop) {
+                NfcWorkerResult ev = {
+                    .event    = ok ? NfcWorkerEventReadSuccess : NfcWorkerEventReadFail,
+                    .tag_data = result,
+                };
+                w->state = WorkerStateIdle;
+                if(w->cb) w->cb(ev, w->cb_ctx);
+            }
+        } else if(cur == WorkerStateWrite) {
+            bool ok = do_write(w->nfc, &w->write_data);
+            if(w->state != WorkerStateStop) {
+                NfcWorkerResult ev = {
+                    .event = ok ? NfcWorkerEventWriteSuccess : NfcWorkerEventWriteFail,
+                };
+                w->state = WorkerStateIdle;
+                if(w->cb) w->cb(ev, w->cb_ctx);
+            }
+        } else {
+            furi_delay_ms(POLL_MS);
+        }
+    }
+
+    return 0;
 }
 
 NfcWorker* nfc_worker_alloc(void) {
     NfcWorker* w = malloc(sizeof(NfcWorker));
     memset(w, 0, sizeof(NfcWorker));
-    w->nfc = nfc_alloc();
+    w->nfc    = nfc_alloc();
+    w->state  = WorkerStateIdle;
+    w->thread = furi_thread_alloc_ex("FlipBoxNfc", STACK_SIZE, worker_thread, w);
     return w;
 }
 
 void nfc_worker_free(NfcWorker* w) {
     furi_assert(w);
-    worker_stop_poller(w);
+    furi_thread_free(w->thread);
     nfc_free(w->nfc);
     free(w);
 }
@@ -121,26 +130,23 @@ void nfc_worker_start(NfcWorker* w, NfcWorkerCallback cb, void* context) {
     furi_assert(w);
     w->cb     = cb;
     w->cb_ctx = context;
+    w->state  = WorkerStateIdle;
+    furi_thread_start(w->thread);
 }
 
 void nfc_worker_stop(NfcWorker* w) {
     furi_assert(w);
-    worker_stop_poller(w);
+    w->state = WorkerStateStop;
+    furi_thread_join(w->thread);
 }
 
 void nfc_worker_read(NfcWorker* w) {
     furi_assert(w);
-    worker_stop_poller(w);
-    w->op     = WorkerOpRead;
-    w->poller = nfc_poller_alloc(w->nfc, NfcProtocolMfClassic);
-    nfc_poller_start(w->poller, worker_poller_cb, w);
+    w->state = WorkerStateRead;
 }
 
 void nfc_worker_write(NfcWorker* w, const QidiTagData* data) {
     furi_assert(w);
     memcpy(&w->write_data, data, sizeof(QidiTagData));
-    worker_stop_poller(w);
-    w->op     = WorkerOpWrite;
-    w->poller = nfc_poller_alloc(w->nfc, NfcProtocolMfClassic);
-    nfc_poller_start(w->poller, worker_poller_cb, w);
+    w->state = WorkerStateWrite;
 }

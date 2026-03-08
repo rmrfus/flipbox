@@ -67,22 +67,24 @@ scenes/
 
 ## NFC worker
 
-`nfc_worker.c` uses event-based `NfcPoller` (`nfc_poller_alloc` / `nfc_poller_start` / `nfc_poller_stop`).
-No FuriThread. Main thread calls `nfc_worker_read()` / `nfc_worker_write()` → starts poller →
-callback fires in NFC stack context → fires user callback → `view_dispatcher_send_custom_event`.
-Single callback registered once in `flipbox_app_alloc`, routes events to both read and write scenes.
+`nfc_worker.c` uses `FuriThread` + synchronous `mf_classic_poller_sync_*` API.
+Thread is started in `nfc_worker_start()` and runs for app lifetime.
+Scene calls `nfc_worker_read()` / `nfc_worker_write()` → sets worker state → thread picks it up →
+calls `mf_classic_poller_sync_read_block` / `mf_classic_poller_sync_write_block` → fires user
+callback → `view_dispatcher_send_custom_event`.
 
-**Callback strategy:** intercept `MfClassicPollerEventTypeRequestMode` (fires once after card detection,
-before the poller's own auth loop). At that point the card is activated but crypto is clean — ideal
-for manual `mf_classic_poller_auth` + `mf_classic_poller_read_block/write_block`. Return
-`NfcCommandStop` to skip the poller's built-in sector iteration entirely.
+Auth keys tried in order: primary D3:F7:D3:F7:D3:F7, then factory default FF:FF:FF:FF:FF:FF.
 
-**Cancellation:** `nfc_worker_stop()` calls `nfc_poller_stop()` + `nfc_poller_free()` — non-blocking,
-no thread join. Navigating away mid-op no longer stalls the UI. If a stale callback fires after
-stop, the menu scene harmlessly ignores it.
+**Why not event-based poller:** `mf_classic_poller_write_block` fails when called from
+`MfClassicPollerEventTypeRequestMode` callback context. Read works but write silently fails.
+Sync API (`mf_classic_poller_sync_write_block`) is the reliable path.
 
-**Retry:** on fail the NFC scene calls `nfc_worker_read/write()` again, which stops+frees the old
-poller and starts a fresh one.
+**Cancellation:** `nfc_worker_stop()` sets state=Stop and joins thread. Thread exits after current
+sync operation completes (fast — sync ops timeout quickly). Stale ReadFail/WriteFail events
+delivered after scene change are harmlessly ignored by the new scene.
+
+**Retry:** on fail the NFC scene sets state back to Read/Write by calling `nfc_worker_read/write()`
+again. Thread picks it up on the next loop iteration.
 
 ## Materials
 
@@ -108,4 +110,4 @@ Support (20-21), TPU (33-34), Other (22,30,32).
   visible items need two distinct buffers (`text_buf` / `text_buf2` in `FlipBoxApp`)
 - Flipper display font is ASCII-only — no Unicode
 - In write_cfg: `...` suffix = opens submenu, `>` = executes action (space before `...`: `"%s ..."`)
-- NFC worker no longer uses FuriThread — `stack_size` in `application.fam` is for the app main thread only
+- NFC worker uses FuriThread with STACK_SIZE=2KB; `stack_size=4KB` in `application.fam` is for the app main thread
