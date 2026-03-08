@@ -106,8 +106,11 @@ Support (20-21), TPU (33-34), Other (22,30,32).
   `on_event_handlers`, `on_exit_handlers`) — not a per-scene struct.
 - Correct callback name: `variable_item_list_set_enter_callback` (not `set_selected_item_callback`)
 - `view_dispatcher_enable_queue` is deprecated — do not use
-- `variable_item_set_current_value_text` stores a **pointer**, not a copy — two simultaneously
-  visible items need two distinct buffers (`text_buf` / `text_buf2` in `FlipBoxApp`)
+- `variable_item_set_current_value_text` stores a **pointer**, not a copy — pass string literals
+  or buffers that outlive the scene. In `scene_write_cfg` material/color names are passed as
+  labels (not values) so they point directly into the global `qidi_materials`/`qidi_colors` arrays.
+- VariableItemList column split is **fixed in pixels**: label x=6..73 (67px ≈11 chars), value
+  x=73..115 (42px ≈7 chars), no scrolling. Put long text in the label column, not the value.
 - Flipper display font is ASCII-only — no Unicode
 - In write_cfg: `...` suffix = opens submenu, `>` = executes action (space before `...`: `"%s ..."`)
 - NFC worker uses FuriThread with STACK_SIZE=2KB; `stack_size=4KB` in `application.fam` is for the app main thread

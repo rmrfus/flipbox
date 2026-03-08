@@ -7,10 +7,10 @@ typedef enum {
 
 static void menu_cb(void* context, uint32_t index) {
     FlipBoxApp* app = context;
-    if(index == MenuItemRead) {
-        scene_manager_next_scene(app->scene_manager, FlipBoxSceneRead);
-    } else {
+    if(index == MenuItemWrite) {
         scene_manager_next_scene(app->scene_manager, FlipBoxSceneWriteCfg);
+    } else {
+        scene_manager_next_scene(app->scene_manager, FlipBoxSceneRead);
     }
 }
 

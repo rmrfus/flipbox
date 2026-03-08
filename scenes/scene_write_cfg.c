@@ -34,9 +34,9 @@ void flipbox_scene_write_cfg_on_enter(void* context) {
 
     VariableItem* item;
 
-    // Material — OK opens submenu, append ">" to signal that
+    // Material — OK opens submenu, append "..." to signal that
     snprintf(app->text_buf, sizeof(app->text_buf), "%s ...", qidi_materials[app->mat_idx].name);
-    item = variable_item_list_add(list, "Mat", 0, NULL, NULL);
+    item = variable_item_list_add(list, "Material", 0, NULL, NULL);
     variable_item_set_current_value_text(item, app->text_buf);
 
     // Color — same, separate buffer so Material text isn't overwritten
@@ -50,7 +50,7 @@ void flipbox_scene_write_cfg_on_enter(void* context) {
     variable_item_set_current_value_text(item, qidi_manufacturers[app->mfr_idx].name);
 
     // Write button row
-    item = variable_item_list_add(list, "Write", 1, NULL, NULL);
+    item = variable_item_list_add(list, "Write Tag", 1, NULL, NULL);
     variable_item_set_current_value_text(item, ">");
 
     variable_item_list_set_enter_callback(list, cfg_enter_cb, app);
