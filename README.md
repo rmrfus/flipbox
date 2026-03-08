@@ -30,18 +30,23 @@ Works with any MIFARE Classic 1K spool tag (FM11RF08S or compatible).
 
 ## Install
 
-**Option A — download:** grab `flipbox.fap` from [Releases](https://github.com/rmrfus/flipbox/releases) and copy to `SD:/apps/NFC/` via [qFlipper](https://flipperzero.one/update) or USB mass storage (`Settings → USB → Mass Storage` on the Flipper).
+**Download:** grab `flipbox.fap` from [Releases](https://github.com/rmrfus/flipbox/releases) and copy to `SD:/apps/NFC/` via [qFlipper](https://flipperzero.one/update) or USB mass storage (`Settings → USB → Mass Storage` on the Flipper).
 
-**Option B — build and deploy over USB:**
+**Build from source** (requires [ufbt](https://github.com/flipperdevices/flipperzero-ufbt) and [direnv](https://direnv.net/)):
 
 ```zsh
 git clone https://github.com/rmrfus/flipbox
 cd flipbox
 direnv allow
+
+# just build → dist/flipbox.fap
+direnv exec . ufbt
+
+# or build + deploy + launch over USB
 direnv exec . ufbt launch
 ```
 
-`ufbt launch` builds the app, copies it to `SD:/apps/NFC/` over USB serial, and starts it immediately. The Flipper must be connected, unlocked, and on the main screen. After that the app stays installed permanently.
+`ufbt launch` copies the app to `SD:/apps/NFC/` over USB serial and starts it immediately. The Flipper must be connected, unlocked, and on the main screen.
 
 ## Tag format
 
@@ -80,18 +85,6 @@ Auth keys tried in order:
 White, Black, Red, Blue, Green, Yellow, Orange, Purple, Pink, Grey, Brown, Beige,
 Gold, Silver, Cyan, Transparent, Skin, Sky Blue, Army Green, Dark Blue, Dark Red,
 Dark Green, Ocean Blue, Multicolor.
-
-## Build from source
-
-Requires [ufbt](https://github.com/flipperdevices/flipperzero-ufbt) and [direnv](https://direnv.net/).
-
-```zsh
-git clone https://github.com/rmrfus/flipbox
-cd flipbox
-direnv allow
-direnv exec . ufbt
-# output: dist/flipbox.fap
-```
 
 ## References
 
