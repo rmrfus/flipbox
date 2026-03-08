@@ -6,29 +6,44 @@ const uint8_t QIDI_KEY_DEFAULT[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
 // Codes are the actual hex values written to the tag.
 // Wiki documents them in decimal; these are the converted hex equivalents.
+// Source: https://wiki.qidi3d.com/en/QIDIBOX/RFID
+// Codes 9,10,15-17,20-23,28-29,35-36,46,48 are unassigned in the wiki.
 const QidiMaterialInfo qidi_materials[QIDI_MATERIAL_COUNT] = {
-    { 1,  "PLA"       },
-    { 2,  "PLA Matte" },
-    { 3,  "PLA Metal" },
-    { 4,  "PLA Silk"  },
-    { 5,  "PLA-CF"    },
-    { 6,  "PLA-Wood"  },
-    { 11, "ABS"       },
-    { 12, "ABS-GF"    },
-    { 13, "ABS-Metal" },
-    { 18, "ASA"       },
-    { 19, "ASA-AERO"  },
-    { 24, "PA"        },
-    { 25, "PA-CF"     },
-    { 30, "PAHT-CF"   },
-    { 31, "PAHT-GF"   },
-    { 34, "PC/ABS-FR" },
-    { 37, "PET-CF"    },
-    { 38, "PET-GF"    },
-    { 41, "PETG"      },
-    { 44, "PPS-CF"    },
-    { 47, "PVA"       },
-    { 50, "TPU"       },
+    {  1, "PLA"               },
+    {  2, "PLA Matte"         },
+    {  3, "PLA Metal"         },
+    {  4, "PLA Silk"          },
+    {  5, "PLA-CF"            },
+    {  6, "PLA-Wood"          },
+    {  7, "PLA Basic"         },
+    {  8, "PLA Matte Basic"   },
+    { 11, "ABS"               },
+    { 12, "ABS-GF"            },
+    { 13, "ABS-Metal"         },
+    { 14, "ABS-Odorless"      },
+    { 18, "ASA"               },
+    { 19, "ASA-AERO"          },
+    { 24, "UltraPA"           },
+    { 25, "PA-CF"             },
+    { 26, "UltraPA-CF25"      },
+    { 27, "PA12-CF"           },
+    { 30, "PAHT-CF"           },
+    { 31, "PAHT-GF"           },
+    { 32, "Support For PAHT"  },
+    { 33, "Support For PET/PA"},
+    { 34, "PC/ABS-FR"         },
+    { 37, "PET-CF"            },
+    { 38, "PET-GF"            },
+    { 39, "PETG Basic"        },
+    { 40, "PETG Tough"        },
+    { 41, "PETG Rapido"       },
+    { 42, "PETG-CF"           },
+    { 43, "PETG-GF"           },
+    { 44, "PPS-CF"            },
+    { 45, "PETG Translucent"  },
+    { 47, "PVA"               },
+    { 49, "TPU-Aero"          },
+    { 50, "TPU"               },
 };
 
 const QidiColorInfo qidi_colors[QIDI_COLOR_COUNT] = {
@@ -61,6 +76,20 @@ const QidiColorInfo qidi_colors[QIDI_COLOR_COUNT] = {
 const QidiManufacturerInfo qidi_manufacturers[QIDI_MFR_COUNT] = {
     { 0x01, "QIDI"    },
     { 0x02, "Generic" },
+};
+
+// Material group index → indices into qidi_materials[]
+// qidi_materials[] order: PLA(0-7) ABS(8-11) ASA(12-13) PA(14-19)
+//   Support(20-21) PC(22) PET/PETG(23-29) PPS(30) PETGTrans(31) PVA(32) TPU(33-34)
+const QidiMaterialGroup qidi_material_groups[QIDI_GROUP_COUNT] = {
+    { "PLA",        { 0,  1,  2,  3,  4,  5,  6,  7           }, 8 },
+    { "ABS",        { 8,  9, 10, 11                            }, 4 },
+    { "ASA",        {12, 13                                    }, 2 },
+    { "PA / Nylon", {14, 15, 16, 17, 18, 19                   }, 6 },
+    { "PET / PETG", {23, 24, 25, 26, 27, 28, 29, 31           }, 8 },
+    { "Support",    {20, 21                                    }, 2 },
+    { "TPU",        {33, 34                                    }, 2 },
+    { "Other",      {22, 30, 32                                }, 3 },
 };
 
 int qidi_material_idx_by_code(uint8_t code) {

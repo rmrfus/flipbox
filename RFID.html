@@ -1,0 +1,436 @@
+<!DOCTYPE html><html lang="en"><head><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta charset="UTF-8"><meta name="viewport" content="user-scalable=yes, width=device-width, initial-scale=1, maximum-scale=5"><meta name="theme-color" content="#1976d2"><meta name="msapplication-TileColor" content="#1976d2"><meta name="msapplication-TileImage" content="/_assets/favicons/mstile-150x150.png"><title>QIDI BOX-RFID-Tag-Guide | QIDI Wiki</title><meta name="description" content="RFID-Tag-Guide"><meta property="og:title" content="QIDI BOX-RFID-Tag-Guide"><meta property="og:type" content="website"><meta property="og:description" content="RFID-Tag-Guide"><meta property="og:image"><meta property="og:url" content="https://wiki.qidi3d.com/en/QIDIBOX/RFID"><meta property="og:site_name" content="QIDI Wiki"><link rel="apple-touch-icon" sizes="180x180" href="/_assets/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="192x192" href="/_assets/favicons/android-chrome-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/_assets/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/_assets/favicons/favicon-16x16.png"><link rel="mask-icon" href="/_assets/favicons/safari-pinned-tab.svg" color="#1976d2"><link rel="manifest" href="/_assets/manifest.json"><script>var siteConfig = {"title":"QIDI Wiki","theme":"default","darkMode":false,"tocPosition":"left","lang":"en","rtl":false,"company":"QIDI Tech","contentLicense":"alr","logoUrl":"/微信图片_20241217131147.png"}
+var siteLangs = [{"code":"en","name":"English"},{"code":"zh","name":"中文 (Zhōngwén)"}]
+</script><link type="text/css" rel="stylesheet" href="/_assets/css/app.b3759194db690fde39f2.css"><script type="text/javascript" src="/_assets/js/runtime.js?1675554523"></script><script type="text/javascript" src="/_assets/js/app.js?1675554523"></script></head><body><div id="root"><page locale="en" path="QIDIBOX/RFID" title="QIDI BOX-RFID-Tag-Guide" description="RFID-Tag-Guide" :tags="[{&quot;tag&quot;:&quot;qidi box&quot;,&quot;title&quot;:&quot;qidi box&quot;},{&quot;tag&quot;:&quot;rfid&quot;,&quot;title&quot;:&quot;rfid&quot;},{&quot;tag&quot;:&quot;nfc&quot;,&quot;title&quot;:&quot;nfc&quot;}]" created-at="2025-07-10T07:39:37.074Z" updated-at="2025-12-03T01:06:57.621Z" author-name="固体李逵" :author-id="4" editor="markdown" :is-published="true" toc="W3sidGl0bGUiOiJSRklELVRhZy1HdWlkZSBmb3IgUUlESSBCT1giLCJhbmNob3IiOiIjcmZpZC10YWctZ3VpZGUtZm9yLXFpZGktYm94IiwiY2hpbGRyZW4iOlt7InRpdGxlIjoiUmFkaW8gRnJlcXVlbmN5IChSRikgSW50ZXJmYWNlIG9mIHRoZSBGTTExUkYwOFMgQ2hpcCIsImFuY2hvciI6IiNyYWRpby1mcmVxdWVuY3ktcmYtaW50ZXJmYWNlLW9mLXRoZS1mbTExcmYwOHMtY2hpcCIsImNoaWxkcmVuIjpbXX0seyJ0aXRsZSI6IkVFUFJPTSBNZW1vcnkgb2YgdGhlIEZNMTFSRjA4UyBDaGlwIiwiYW5jaG9yIjoiI2VlcHJvbS1tZW1vcnktb2YtdGhlLWZtMTFyZjA4cy1jaGlwIiwiY2hpbGRyZW4iOlt7InRpdGxlIjoiVGhlIGRlZmF1bHQgZmFjdG9yeSBjb25maWd1cmF0aW9uIGlzIGFzIGZvbGxvd3PvvJoiLCJhbmNob3IiOiIjdGhlLWRlZmF1bHQtZmFjdG9yeS1jb25maWd1cmF0aW9uLWlzLWFzLWZvbGxvd3MiLCJjaGlsZHJlbiI6W119XX0seyJ0aXRsZSI6IkZNMTFSRjA4UyBDaGlwIEluc3RydWN0aW9uIFNldCIsImFuY2hvciI6IiNmbTExcmYwOHMtY2hpcC1pbnN0cnVjdGlvbi1zZXQiLCJjaGlsZHJlbiI6W119LHsidGl0bGUiOiJSRklEIERhdGEgU3RvcmFnZSBTdHJ1Y3R1cmUiLCJhbmNob3IiOiIjcmZpZC1kYXRhLXN0b3JhZ2Utc3RydWN0dXJlIiwiY2hpbGRyZW4iOlt7InRpdGxlIjoiTWF0ZXJpYWwgQ29kZSIsImFuY2hvciI6IiNtYXRlcmlhbC1jb2RlIiwiY2hpbGRyZW4iOltdfSx7InRpdGxlIjoiQ29sb3IgQ29kZSIsImFuY2hvciI6IiNjb2xvci1jb2RlIiwiY2hpbGRyZW4iOltdfV19LHsidGl0bGUiOiJDb21tdW5pdHkgU2hhcmluZyIsImFuY2hvciI6IiNjb21tdW5pdHktc2hhcmluZyIsImNoaWxkcmVuIjpbXX1dfV0=" :page-id="767" sidebar="W3siaSI6InNkaS0xIiwiayI6ImxpbmsiLCJsIjoiSG9tZSIsImMiOiJtZGktaG9tZSIsInkiOiJwYWdlIiwidCI6Ii9lbi9ob21lIn0seyJpIjoic2RpLTIiLCJrIjoiZGl2aWRlciIsImwiOm51bGwsImMiOm51bGwsInkiOm51bGwsInQiOm51bGx9LHsiaSI6InNkaS0zIiwiayI6ImhlYWRlciIsImwiOiJRSURJIDNEIFByaW50ZXIiLCJjIjpudWxsLCJ5IjpudWxsLCJ0IjpudWxsfSx7ImkiOiJzZGktNCIsImsiOiJsaW5rIiwibCI6Ik1heDQiLCJjIjoibWRpLWFscGhhLW0tYm94LW91dGxpbmUiLCJ5IjoicGFnZSIsInQiOiIvZW4vTWF4NCJ9LHsiaSI6InNkaS01IiwiayI6ImxpbmsiLCJsIjoiUTIiLCJjIjoibWRpLWFscGhhLXEtYm94LW91dGxpbmUiLCJ5IjoicGFnZSIsInQiOiIvZW4vUTIifSx7ImkiOiJzZGktNiIsImsiOiJsaW5rIiwibCI6IlgtUGx1czQiLCJjIjoibWRpLWFscGhhLXAtYm94LW91dGxpbmUiLCJ5IjoicGFnZSIsInQiOiIvZW4vWC1QbHVzNCJ9LHsiaSI6InNkaS03IiwiayI6ImxpbmsiLCJsIjoiUTEgUHJvIiwiYyI6Im1kaS1hbHBoYS1xLWJveC1vdXRsaW5lIiwieSI6InBhZ2UiLCJ0IjoiL2VuL1ExLVBybyJ9LHsiaSI6InNkaS04IiwiayI6ImxpbmsiLCJsIjoiWC1NYXgzIiwiYyI6Im1kaS1hbHBoYS14LWJveC1vdXRsaW5lIiwieSI6InBhZ2UiLCJ0IjoiL2VuL1gtTWF4MyJ9LHsiaSI6InNkaS05IiwiayI6ImxpbmsiLCJsIjoiWC1QbHVzMyIsImMiOiJtZGktYWxwaGEteC1ib3gtb3V0bGluZSIsInkiOiJwYWdlIiwidCI6Ii9lbi9YLVBsdXMzIn0seyJpIjoic2RpLTEwIiwiayI6ImxpbmsiLCJsIjoiWC1TbWFydDMiLCJjIjoibWRpLWFscGhhLXgtYm94LW91dGxpbmUiLCJ5IjoicGFnZSIsInQiOiIvZW4vWC1TbWFydDMifSx7ImkiOiJzZGktMTEiLCJrIjoibGluayIsImwiOiJJLUZhc3QiLCJjIjoibWRpLWFscGhhLWktYm94LW91dGxpbmUiLCJ5IjoicGFnZSIsInQiOiIvZW4vSS1GYXN0In0seyJpIjoic2RpLTEyIiwiayI6ImxpbmsiLCJsIjoiUUlESSBCT1giLCJjIjoibWRpLWFscGhhLWItYm94LW91dGxpbmUiLCJ5IjoicGFnZSIsInQiOiIvZW4vUUlESUJPWCJ9LHsiaSI6InNkaS0xMyIsImsiOiJsaW5rIiwibCI6IlFEQyIsImMiOiJtZGktYWxwaGEtcS1ib3gtb3V0bGluZSIsInkiOiJwYWdlIiwidCI6Ii9lbi9RREMifSx7ImkiOiJzZGktMTQiLCJrIjoiZGl2aWRlciIsImwiOm51bGwsImMiOm51bGwsInkiOm51bGwsInQiOm51bGx9LHsiaSI6InNkaS0xNSIsImsiOiJoZWFkZXIiLCJsIjoiU29mdHdhcmUiLCJjIjpudWxsLCJ5IjpudWxsLCJ0IjpudWxsfSx7ImkiOiJzZGktMTYiLCJrIjoibGluayIsImwiOiJRSURJIFN0dWRpbyIsImMiOiJtZGkgbWRpLXRlbGV2aXNpb24tZ3VpZGUiLCJ5IjoicGFnZSIsInQiOiIvZW4vc29mdHdhcmUvcWlkaS1zdHVkaW8ifSx7ImkiOiJzZGktMTciLCJrIjoibGluayIsImwiOiJRSURJIFNsaWNlciIsImMiOiJtZGkgbWRpLXRlbGV2aXNpb24tZ3VpZGUiLCJ5IjoicGFnZSIsInQiOiIvZW4vc29mdHdhcmUvcWlkaS1zbGljZXIifSx7ImkiOiJzZGktMTgiLCJrIjoibGluayIsImwiOiJRSURJIExpbmsiLCJjIjoibWRpLWNlbGxwaG9uZSIsInkiOiJwYWdlIiwidCI6Ii9lbi9hcHAifSx7ImkiOiJzZGktMTkiLCJrIjoiZGl2aWRlciIsImwiOm51bGwsImMiOm51bGwsInkiOm51bGwsInQiOm51bGx9LHsiaSI6InNkaS0yMCIsImsiOiJoZWFkZXIiLCJsIjoiR2VuZXJhbCIsImMiOm51bGwsInkiOm51bGwsInQiOm51bGx9LHsiaSI6InNkaS0yMSIsImsiOiJsaW5rIiwibCI6IkZpbGFtZW50LUd1aWRlIiwiYyI6Im1kaS1wcmludGVyLTNkLW5venpsZS1vdXRsaW5lIiwieSI6InBhZ2UiLCJ0IjoiL2VuL01lbW8vRmlsYW1lbnQtR3VpZGUifSx7ImkiOiJzZGktMjIiLCJrIjoibGluayIsImwiOiJHbG9zc2FyeSIsImMiOiJtZGktdGV4dC1zZWFyY2giLCJ5IjoicGFnZSIsInQiOiIvZW4vb3RoZXJzL0dsb3NzYXJ5In0seyJpIjoic2RpLTIzIiwiayI6ImxpbmsiLCJsIjoiRkFRIiwiYyI6Im1kaS1oZWxwIiwieSI6InBhZ2UiLCJ0IjoiL2VuL290aGVycy9oZWxwIn0seyJpIjoic2RpLTI0IiwiayI6ImxpbmsiLCJsIjoiQWJvdXQgdXMiLCJjIjoibWRpLWZhY3RvcnkiLCJ5IjoicGFnZSIsInQiOiIvZW4vb3RoZXJzL2Fib3V0dXMifSx7ImkiOiJzZGktMjUiLCJrIjoiZGl2aWRlciIsImwiOm51bGwsImMiOm51bGwsInkiOm51bGwsInQiOm51bGx9LHsiaSI6InNkaS0yNiIsImsiOiJsaW5rIiwibCI6IkFmdGVyIHNhbGVzIGNvbnRhY3QgaW5mb3JtYXRpb24iLCJjIjoibWRpLWNhcmQtYWNjb3VudC1tYWlsIiwieSI6InBhZ2UiLCJ0IjoiL2VuL0FmdGVyU2FsZXNDb250YWN0In0seyJpIjoic2RpLTI3IiwiayI6ImRpdmlkZXIiLCJsIjpudWxsLCJjIjpudWxsLCJ5IjpudWxsLCJ0IjpudWxsfV0=" nav-mode="STATIC" comments-enabled effective-permissions="eyJjb21tZW50cyI6eyJyZWFkIjpmYWxzZSwid3JpdGUiOmZhbHNlLCJtYW5hZ2UiOmZhbHNlfSwiaGlzdG9yeSI6eyJyZWFkIjpmYWxzZX0sInNvdXJjZSI6eyJyZWFkIjpmYWxzZX0sInBhZ2VzIjp7InJlYWQiOnRydWUsIndyaXRlIjpmYWxzZSwibWFuYWdlIjpmYWxzZSwiZGVsZXRlIjpmYWxzZSwic2NyaXB0IjpmYWxzZSwic3R5bGUiOmZhbHNlfSwic3lzdGVtIjp7Im1hbmFnZSI6ZmFsc2V9fQ==" edit-shortcuts="eyJlZGl0RmFiIjp0cnVlLCJlZGl0TWVudUJhciI6ZmFsc2UsImVkaXRNZW51QnRuIjp0cnVlLCJlZGl0TWVudUV4dGVybmFsQnRuIjp0cnVlLCJlZGl0TWVudUV4dGVybmFsTmFtZSI6IkdpdEh1YiIsImVkaXRNZW51RXh0ZXJuYWxJY29uIjoibWRpLWdpdGh1YiIsImVkaXRNZW51RXh0ZXJuYWxVcmwiOiJodHRwczovL2dpdGh1Yi5jb20vb3JnL3JlcG8vYmxvYi9tYWluL3tmaWxlbmFtZX0ifQ==" filename="en/QIDIBOX/RFID.md"><template slot="contents"><div><h1 class="toc-header" id="rfid-tag-guide-for-qidi-box"><a href="#rfid-tag-guide-for-qidi-box" class="toc-anchor">¶</a> RFID-Tag-Guide for QIDI BOX</h1>
+<h2 class="toc-header" id="radio-frequency-rf-interface-of-the-fm11rf08s-chip"><a href="#radio-frequency-rf-interface-of-the-fm11rf08s-chip" class="toc-anchor">¶</a> Radio Frequency (RF) Interface of the FM11RF08S Chip</h2>
+<ul>
+<li>Communication Protocol: Complies with ISO/IEC 14443-A</li>
+<li>Operating Frequency Range: 13.56 MHz</li>
+<li>Communication Baud Rate: 106 Kbit/s</li>
+<li>Operating Distance: Not less than 100 mm (dependent on antenna size)</li>
+<li>Encryption Algorithm: Compliant with M1 standard</li>
+</ul>
+<h2 class="toc-header" id="eeprom-memory-of-the-fm11rf08s-chip"><a href="#eeprom-memory-of-the-fm11rf08s-chip" class="toc-anchor">¶</a> EEPROM Memory of the FM11RF08S Chip</h2>
+<p>The EEPROM is divided into 16 sectors, each consisting of 4 data blocks, with each block containing 16 bytes.<br>
+<img width="800" alt="rfid-1-en.png" src="/rfid-1-en.png"></p>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th>Block Type</th>
+<th>Stored Content</th>
+<th>Read/Write Permissions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Manufacturer Block</td>
+<td>Stores manufacturer code</td>
+<td>Read-only</td>
+</tr>
+<tr>
+<td>Control Block</td>
+<td>Password A, Access Control, Password B</td>
+<td>Readable and writable</td>
+</tr>
+<tr>
+<td>Data Block</td>
+<td>Stores user data</td>
+<td>Readable and writable</td>
+</tr>
+</tbody>
+</table></div>
+<h3 class="toc-header" id="the-default-factory-configuration-is-as-follows"><a href="#the-default-factory-configuration-is-as-follows" class="toc-anchor">¶</a> The default factory configuration is as follows：</h3>
+<p><img alt="rfid-3.png" src="/rfid-3.png"></p>
+<h2 class="toc-header" id="fm11rf08s-chip-instruction-set"><a href="#fm11rf08s-chip-instruction-set" class="toc-anchor">¶</a> FM11RF08S Chip Instruction Set</h2>
+<p><img alt="rfid-2-en.png" src="/rfid-2-en.png"></p>
+<h2 class="toc-header" id="rfid-data-storage-structure"><a href="#rfid-data-storage-structure" class="toc-anchor">¶</a> RFID Data Storage Structure</h2>
+<blockquote class="is-info">
+<p>RFID data is stored in the 4th data block.（sector 1 Block 0）</p>
+</blockquote>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bit[0]</td>
+<td>Material Code</td>
+<td>1~50</td>
+</tr>
+<tr>
+<td>bit[1]</td>
+<td>Color Code</td>
+<td>1~24</td>
+</tr>
+<tr>
+<td>bit[2]</td>
+<td>Manufacturer Code</td>
+<td>The default value is 1</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Hexadecimal encoding</strong></p>
+<h3 class="toc-header" id="material-code"><a href="#material-code" class="toc-anchor">¶</a> Material Code</h3>
+<div class="table-container"><table>
+<thead>
+<tr>
+<th>Material</th>
+<th>Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PLA</td>
+<td>1</td>
+</tr>
+<tr>
+<td>PLA Matte</td>
+<td>2</td>
+</tr>
+<tr>
+<td>PLA Metal</td>
+<td>3</td>
+</tr>
+<tr>
+<td>PLA Silk</td>
+<td>4</td>
+</tr>
+<tr>
+<td>PLA-CF</td>
+<td>5</td>
+</tr>
+<tr>
+<td>PLA-Wood</td>
+<td>6</td>
+</tr>
+<tr>
+<td>PLA Basic</td>
+<td>7</td>
+</tr>
+<tr>
+<td>PLA Matte Basic</td>
+<td>8</td>
+</tr>
+<tr>
+<td></td>
+<td>9</td>
+</tr>
+<tr>
+<td></td>
+<td>10</td>
+</tr>
+<tr>
+<td>ABS</td>
+<td>11</td>
+</tr>
+<tr>
+<td>ABS-GF</td>
+<td>12</td>
+</tr>
+<tr>
+<td>ABS-Metal</td>
+<td>13</td>
+</tr>
+<tr>
+<td>ABS-Odorless</td>
+<td>14</td>
+</tr>
+<tr>
+<td></td>
+<td>15</td>
+</tr>
+<tr>
+<td></td>
+<td>16</td>
+</tr>
+<tr>
+<td></td>
+<td>17</td>
+</tr>
+<tr>
+<td>ASA</td>
+<td>18</td>
+</tr>
+<tr>
+<td>ASA-AERO</td>
+<td>19</td>
+</tr>
+<tr>
+<td></td>
+<td>20</td>
+</tr>
+<tr>
+<td></td>
+<td>21</td>
+</tr>
+<tr>
+<td></td>
+<td>22</td>
+</tr>
+<tr>
+<td></td>
+<td>23</td>
+</tr>
+<tr>
+<td>UltraPA</td>
+<td>24</td>
+</tr>
+<tr>
+<td>PA-CF</td>
+<td>25</td>
+</tr>
+<tr>
+<td>UltraPA-CF25</td>
+<td>26</td>
+</tr>
+<tr>
+<td>PA12-CF</td>
+<td>27</td>
+</tr>
+<tr>
+<td></td>
+<td>28</td>
+</tr>
+<tr>
+<td></td>
+<td>29</td>
+</tr>
+<tr>
+<td>PAHT-CF</td>
+<td>30</td>
+</tr>
+<tr>
+<td>PAHT-GF</td>
+<td>31</td>
+</tr>
+<tr>
+<td>Support For PAHT</td>
+<td>32</td>
+</tr>
+<tr>
+<td>Support For PET/PA</td>
+<td>33</td>
+</tr>
+<tr>
+<td>PC/ABS-FR</td>
+<td>34</td>
+</tr>
+<tr>
+<td></td>
+<td>35</td>
+</tr>
+<tr>
+<td></td>
+<td>36</td>
+</tr>
+<tr>
+<td>PET-CF</td>
+<td>37</td>
+</tr>
+<tr>
+<td>PET-GF</td>
+<td>38</td>
+</tr>
+<tr>
+<td>PETG Basic</td>
+<td>39</td>
+</tr>
+<tr>
+<td>PETG Tough</td>
+<td>40</td>
+</tr>
+<tr>
+<td>PETG Rapido</td>
+<td>41</td>
+</tr>
+<tr>
+<td>PETG-CF</td>
+<td>42</td>
+</tr>
+<tr>
+<td>PETG-GF</td>
+<td>43</td>
+</tr>
+<tr>
+<td>PPS-CF</td>
+<td>44</td>
+</tr>
+<tr>
+<td>PETG Translucent</td>
+<td>45</td>
+</tr>
+<tr>
+<td></td>
+<td>46</td>
+</tr>
+<tr>
+<td>PVA</td>
+<td>47</td>
+</tr>
+<tr>
+<td></td>
+<td>48</td>
+</tr>
+<tr>
+<td>TPU-Aero</td>
+<td>49</td>
+</tr>
+<tr>
+<td>TPU</td>
+<td>50</td>
+</tr>
+</tbody>
+</table></div>
+<h3 class="toc-header" id="color-code"><a href="#color-code" class="toc-anchor">¶</a> Color Code</h3>
+<div class="table-container"><table>
+  <tbody><tr>
+    <th>Color</th>
+    <th>Code (RGB888)</th>
+    <th>Code Number</th>
+  </tr>
+  <tr>
+    <td style="background:#FAFAFA;">&nbsp;</td>
+    <td>#FAFAFA</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td style="background:#060606;">&nbsp;</td>
+    <td>#060606</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td style="background:#D9E3ED;">&nbsp;</td>
+    <td>#D9E3ED</td>
+    <td>3</td>
+  </tr>
+  <tr>
+    <td style="background:#5CF30F;">&nbsp;</td>
+    <td>#5CF30F</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td style="background:#63E492;">&nbsp;</td>
+    <td>#63E492</td>
+    <td>5</td>
+  </tr>
+  <tr>
+    <td style="background:#2850FF;">&nbsp;</td>
+    <td>#2850FF</td>
+    <td>6</td>
+  </tr>
+  <tr>
+    <td style="background:#FE98FE;">&nbsp;</td>
+    <td>#FE98FE</td>
+    <td>7</td>
+  </tr>
+  <tr>
+    <td style="background:#DFD628;">&nbsp;</td>
+    <td>#DFD628</td>
+    <td>8</td>
+  </tr>
+  <tr>
+    <td style="background:#228332;">&nbsp;</td>
+    <td>#228332</td>
+    <td>9</td>
+  </tr>
+  <tr>
+    <td style="background:#99DEFF;">&nbsp;</td>
+    <td>#99DEFF</td>
+    <td>10</td>
+  </tr>
+  <tr>
+    <td style="background:#1714B0;">&nbsp;</td>
+    <td>#1714B0</td>
+    <td>11</td>
+  </tr>
+  <tr>
+    <td style="background:#CEC0FE;">&nbsp;</td>
+    <td>#CEC0FE</td>
+    <td>12</td>
+  </tr>
+  <tr>
+    <td style="background:#CADE4B;">&nbsp;</td>
+    <td>#CADE4B</td>
+    <td>13</td>
+  </tr>
+  <tr>
+    <td style="background:#1353AB;">&nbsp;</td>
+    <td>#1353AB</td>
+    <td>14</td>
+  </tr>
+  <tr>
+    <td style="background:#5EA9FD;">&nbsp;</td>
+    <td>#5EA9FD</td>
+    <td>15</td>
+  </tr>
+  <tr>
+    <td style="background:#A878FF;">&nbsp;</td>
+    <td>#A878FF</td>
+    <td>16</td>
+  </tr>
+  <tr>
+    <td style="background:#FE717A;">&nbsp;</td>
+    <td>#FE717A</td>
+    <td>17</td>
+  </tr>
+  <tr>
+    <td style="background:#FF362D;">&nbsp;</td>
+    <td>#FF362D</td>
+    <td>18</td>
+  </tr>
+  <tr>
+    <td style="background:#E2DFCD;">&nbsp;</td>
+    <td>#E2DFCD</td>
+    <td>19</td>
+  </tr>
+  <tr>
+    <td style="background:#898F9B;">&nbsp;</td>
+    <td>#898F9B</td>
+    <td>20</td>
+  </tr>
+  <tr>
+    <td style="background:#6E3812;">&nbsp;</td>
+    <td>#6E3812</td>
+    <td>21</td>
+  </tr>
+  <tr>
+    <td style="background:#CAC59F;">&nbsp;</td>
+    <td>#CAC59F</td>
+    <td>22</td>
+  </tr>
+  <tr>
+    <td style="background:#F28636;">&nbsp;</td>
+    <td>#F28636</td>
+    <td>23</td>
+  </tr>
+  <tr>
+    <td style="background:#B87F2B;">&nbsp;</td>
+    <td>#B87F2B</td>
+    <td>24</td>
+  </tr>
+</tbody></table></div>
+<h2 class="toc-header" id="community-sharing"><a href="#community-sharing" class="toc-anchor">¶</a> Community Sharing</h2>
+<ul>
+<li>
+<p>1<br>
+<a class="is-external-link" href="https://play.google.com/store/apps/details?id=com.fab3dmaker.myfilaments">https://play.google.com/store/apps/details?id=com.fab3dmaker.myfilaments</a><br>
+Thank you, Fabrizio, for creating an app that can read and modify the identification tags of our filaments. We really appreciate your effort and contribution.</p>
+</li>
+<li>
+<p>2<br>
+Purchase link of tag that user has successfully read and written：<a class="is-external-link" href="https://amzn.to/4lu9v7c">https://amzn.to/4lu9v7c</a></p>
+</li>
+<li>
+<p>3<br>
+<a class="is-external-link" href="https://github.com/TinkerBarn/BoxRFID">https://github.com/TinkerBarn/BoxRFID</a><br>
+BoxRFID is a desktop app (Electron) to read and write NFC/RFID tags for QIDI Box multi color system. Thanks to Tinkerbarn.</p>
+</li>
+<li>
+<p>4<br>
+QIDI-filament-nfc-flipper, Thanks to Alex: <a class="is-external-link" href="https://github.com/alexk42/qidi-filament-nfc-flipper/releases">Download Link</a></p>
+</li>
+</ul>
+</div></template><template slot="comments"><div><comments></comments></div></template></page></div></body></html>

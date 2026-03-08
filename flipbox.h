@@ -25,7 +25,6 @@ typedef enum {
     FlipBoxCustomEventReadFail,
     FlipBoxCustomEventWriteSuccess,
     FlipBoxCustomEventWriteFail,
-    FlipBoxCustomEventBack,
 } FlipBoxCustomEvent;
 
 typedef struct {
@@ -44,10 +43,12 @@ typedef struct {
     uint8_t mat_idx;   // index into qidi_materials[]
     uint8_t col_idx;   // index into qidi_colors[]
     uint8_t mfr_idx;   // index into qidi_manufacturers[]
+    uint8_t group_idx; // index into qidi_material_groups[]
 
     // last read result (for display in popup)
     QidiTagData last_read;
     bool        last_read_valid;
 
     char text_buf[128];
+    char text_buf2[128];
 } FlipBoxApp;

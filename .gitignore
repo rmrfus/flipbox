@@ -1,8 +1,8 @@
 .ufbt/
 .venv/
 dist/
-dist/
 *.o
 *.d
 *.elf
 *.fap
+.vscode/compile_commands.json

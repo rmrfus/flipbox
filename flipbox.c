@@ -1,7 +1,5 @@
 #include "flipbox.h"
 
-#define TAG "FlipBox"
-
 // Single worker callback — routes NFC events to view_dispatcher as custom events
 static void flipbox_worker_cb(NfcWorkerResult result, void* context) {
     FlipBoxApp* app = context;
@@ -51,7 +49,6 @@ static FlipBoxApp* flipbox_app_alloc(void) {
     app->notification = furi_record_open(RECORD_NOTIFICATION);
 
     app->view_dispatcher = view_dispatcher_alloc();
-    view_dispatcher_enable_queue(app->view_dispatcher);
     view_dispatcher_set_event_callback_context(app->view_dispatcher, app);
     view_dispatcher_set_custom_event_callback(app->view_dispatcher, flipbox_custom_event_cb);
     view_dispatcher_set_navigation_event_callback(app->view_dispatcher, flipbox_back_event_cb);

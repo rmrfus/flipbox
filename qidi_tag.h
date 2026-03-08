@@ -37,9 +37,21 @@ extern const QidiMaterialInfo qidi_materials[];
 extern const QidiColorInfo    qidi_colors[];
 extern const QidiManufacturerInfo qidi_manufacturers[];
 
-#define QIDI_MATERIAL_COUNT    22
+#define QIDI_MATERIAL_COUNT    35
 #define QIDI_COLOR_COUNT       24
 #define QIDI_MFR_COUNT         2
+
+// Material groups — top-level submenu families
+#define QIDI_GROUP_MAX_ITEMS 10
+#define QIDI_GROUP_COUNT     8
+
+typedef struct {
+    const char* name;
+    uint8_t     indices[QIDI_GROUP_MAX_ITEMS]; // indices into qidi_materials[]
+    uint8_t     count;
+} QidiMaterialGroup;
+
+extern const QidiMaterialGroup qidi_material_groups[QIDI_GROUP_COUNT];
 
 // Lookup helpers — return array index, or -1 if not found
 int qidi_material_idx_by_code(uint8_t code);

@@ -6,6 +6,9 @@ typedef enum {
     FlipBoxSceneMenu,
     FlipBoxSceneRead,
     FlipBoxSceneWriteCfg,
+    FlipBoxSceneMaterialGroup,
+    FlipBoxSceneMaterialSelect,
+    FlipBoxSceneColorSelect,
     FlipBoxSceneWrite,
     FlipBoxSceneCount,
 } FlipBoxScene;
