@@ -7,6 +7,7 @@
 #include <gui/modules/submenu.h>
 #include <gui/modules/popup.h>
 #include <gui/modules/variable_item_list.h>
+#include <gui/modules/widget.h>
 #include <notification/notification.h>
 #include <notification/notification_messages.h>
 
@@ -18,11 +19,14 @@ typedef enum {
     FlipBoxViewSubmenu,
     FlipBoxViewPopup,
     FlipBoxViewVariableItemList,
+    FlipBoxViewWidget,
 } FlipBoxView;
 
 typedef enum {
     FlipBoxCustomEventReadSuccess,
     FlipBoxCustomEventReadFail,
+    FlipBoxCustomEventReadRetry,
+    FlipBoxCustomEventReadEditTag,
     FlipBoxCustomEventWriteSuccess,
     FlipBoxCustomEventWriteFail,
 } FlipBoxCustomEvent;
@@ -36,6 +40,7 @@ typedef struct {
     Submenu*          submenu;
     Popup*            popup;
     VariableItemList* var_item_list;
+    Widget*           widget;
 
     NfcWorker*        worker;
 

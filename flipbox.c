@@ -70,6 +70,10 @@ static FlipBoxApp* flipbox_app_alloc(void) {
         FlipBoxViewVariableItemList,
         variable_item_list_get_view(app->var_item_list));
 
+    app->widget = widget_alloc();
+    view_dispatcher_add_view(
+        app->view_dispatcher, FlipBoxViewWidget, widget_get_view(app->widget));
+
     // NFC worker
     app->worker = nfc_worker_alloc();
     nfc_worker_start(app->worker, flipbox_worker_cb, app);
@@ -91,6 +95,9 @@ static void flipbox_app_free(FlipBoxApp* app) {
 
     view_dispatcher_remove_view(app->view_dispatcher, FlipBoxViewVariableItemList);
     variable_item_list_free(app->var_item_list);
+
+    view_dispatcher_remove_view(app->view_dispatcher, FlipBoxViewWidget);
+    widget_free(app->widget);
 
     scene_manager_free(app->scene_manager);
     view_dispatcher_free(app->view_dispatcher);
