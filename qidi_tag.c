@@ -9,7 +9,7 @@ const uint8_t QIDI_KEY_DEFAULT[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 // Source: https://wiki.qidi3d.com/en/QIDIBOX/RFID
 // Codes 9,10,15-17,20-23,28-29,35-36,46,48 are unassigned in the wiki.
 const QidiMaterialInfo qidi_materials[QIDI_MATERIAL_COUNT] = {
-    {  1, "PLA"               },
+    {  1, "PLA Rapido"        },
     {  2, "PLA Matte"         },
     {  3, "PLA Metal"         },
     {  4, "PLA Silk"          },
