@@ -137,6 +137,21 @@ resets to the printer's first material.
 - `scene_manager_search_and_switch_to_previous_scene(sm, FlipBoxSceneWriteCfg)` skips the
   group scene when returning from material select — user lands directly on WriteCfg.
 
+## Device tests
+
+Driven by the `rmrf-code:flipper` skill (`flipper.py info` / `flipper.py run -f ...`), which
+takes screenshots and presses keys over USB RPC. Scenarios live in `tests/device/`:
+
+- `smoke.steps` — menu, printer switching, per-printer groups/materials, row restore,
+  persistence of the printer, read popup. No tag needed and never enters Write, so a tag left on
+  the Flipper is safe. Run after every deploy.
+- `nfc-roundtrip.steps` — **writes the tag twice** (PLA Silk / Red, then PA12-CF read back with
+  Plus4 to check `#27` and the missing Edit & Write). Ask the user first; needs a spare
+  MIFARE Classic 1K tag on the Flipper.
+
+Both stash `settings.bin` and restore it afterwards. Before deploying, `flipper.py info` gives the
+device's API major; build with the matching SDK (see the CI matrix for the zip URLs).
+
 ## Pitfalls
 
 - `SceneManagerHandlers` uses **three separate function pointer arrays** (`on_enter_handlers`,
@@ -146,9 +161,11 @@ resets to the printer's first material.
 - VariableItemList stores the **label as a pointer** (must outlive the item), while
   `variable_item_set_current_value_text` **copies** into a FuriString.
 - VariableItemList column split is **fixed in pixels**: label x=6..73 (67px ≈11 chars), value
-  centered at x=95 between 73..115 (42px ≈7 chars), no scrolling — longer value text spills over
-  the label. Material/color names currently sit in the value column with a `" ..."` suffix, so long
-  names overflow (known issue).
+  centered at x=95 between 73..115 (42px ≈7 chars). Rendering of longer text differs by firmware:
+  - Momentum (mntm-012, checked on device): label and value are clipped to their columns; the
+    selected row marquee-scrolls both, unselected rows show the truncated start ("PLA Rapi").
+  - OFW 1.4.3 / 1.5.1-rc (source only, not checked on device): plain `canvas_draw_str_aligned`,
+    no clipping or scrolling, so a long value can spill past its column.
 - Flipper display font is ASCII-only — no Unicode
 - In write_cfg: `...` suffix = opens submenu, `>` = executes action (space before `...`: `"%s ..."`)
 - CI pins one SDK per API major (`matrix.include` in `.github/workflows/build.yml`, fetched with

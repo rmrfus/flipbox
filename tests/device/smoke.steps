@@ -1,0 +1,42 @@
+# FlipBox UI smoke test (rmrf-code:flipper skill).
+# Needs no tag and never enters the Write scene, so a tag left on the Flipper is
+# safe. The saved printer is stashed and restored at the end.
+
+home
+stash:/ext/apps_data/flipbox/settings.bin
+rm:/ext/apps_data/flipbox/settings.bin
+start:/ext/apps/NFC/flipbox.fap
+shot:menu           # expect: header "FlipBox: QIDI Box NFC"; Write Tag selected, Read Tag below
+
+OK
+shot:cfg-q2         # expect: defaults; Printer "Q2 >" (no "<"), Material "PLA Rapido ...", Color "White ...", Maker "QIDI >"
+RIGHT
+shot:cfg-max4       # expect: Printer "< Max4 >", Material still PLA Rapido (shared row)
+RIGHT
+shot:cfg-plus4      # expect: Printer "< Plus4" (no ">"), Material reset to "PLA ..." (Plus4 has no PLA Rapido)
+
+DOWN OK
+shot:groups-plus4   # expect: header "Material"; "PLA ..." selected, "ABS ...", "ASA ..." visible (submenus show 3 rows under the header)
+DOWN DOWN DOWN OK
+shot:pa-plus4       # expect: header "PA / Nylon"; UltraPA, PA12-CF, UltraPA-CF25 visible; no PA-CF (that is code 25 on Q2/Max4 only)
+BACK BACK
+shot:cfg-returned   # expect: back on write config with the cursor on the Material row, Material "PLA ..."
+
+UP LEFT
+shot:max4-set       # expect: Printer "< Max4 >", Material reset to "PLA Rapido ..." (the "PLA" row is Plus4-only)
+DOWN OK
+DOWN DOWN DOWN DOWN DOWN DOWN OK
+shot:flex-max4      # expect: header "TPU / Flex"; TPU-GF (Max4 only), TPEE, PEBA visible
+BACK BACK
+
+home
+cat:/ext/apps_data/flipbox/settings.bin   # expect: last byte 01 (Max4 persisted)
+start:/ext/apps/NFC/flipbox.fap
+OK
+shot:cfg-restored   # expect: Printer "< Max4 >" restored from settings, Material "PLA Rapido ..."
+
+BACK DOWN OK
+wait:1
+shot:read-wait      # expect: "Read Tag" popup, "Hold tag near Flipper..." or "No tag found. Hold closer..." (a read result if a tag is on the Flipper)
+BACK
+shot:menu-back      # expect: main menu
