@@ -1,0 +1,30 @@
+# Regenerates the README screenshots (rmrf-code:flipper skill):
+#   flipper.py run --out DIR -f tests/device/screenshots.steps
+#   then copy DIR/0?-*.png to screenshots/
+# WRITES THE TAG on the Flipper (PLA Silk / Red, twice); needs a spare
+# MIFARE Classic 1K tag. The saved printer is stashed and restored.
+
+home
+stash:/ext/apps_data/flipbox/settings.bin
+rm:/ext/apps_data/flipbox/settings.bin
+start:/ext/apps/NFC/flipbox.fap
+
+# Prepare the tag so the read screen shows a known value
+OK DOWN OK OK DOWN*3 OK   # Write Tag -> Material -> PLA -> PLA Silk
+DOWN OK DOWN*17 OK        # Color -> Red
+DOWN DOWN OK wait:2       # Write Tag
+home
+start:/ext/apps/NFC/flipbox.fap
+
+shot:menu                 # expect: main menu, Write Tag selected
+DOWN OK wait:2
+shot:read-result          # expect: Material: PLA Silk, Color: Red, Mfr: QIDI; Retry / Edit & Write
+RIGHT
+shot:write-cfg            # expect: prefilled config, Printer "Q2 >" selected, Material PLA Silk, Color Red
+DOWN OK DOWN*3 OK DOWN*4
+shot:material-picker      # expect: "PA / Nylon" list with PAHT-CF selected
+BACK BACK DOWN OK
+shot:color-picker         # expect: "Color" list with Red selected
+BACK DOWN DOWN OK wait:2
+shot:write-success        # expect: "Success!", "Written!", "PLA Silk / Red"
+BACK BACK

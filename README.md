@@ -6,11 +6,11 @@ Flipper Zero app for reading and writing NFC tags used by the [QIDI Box](https:/
 
 | Menu                             | Read result                                    | Write config                                  |
 |----------------------------------|------------------------------------------------|-----------------------------------------------|
-| ![Menu](screenshots/01-menu.jpg) | ![Read result](screenshots/02-read-result.jpg) | ![Write config](screenshots/03-write-cfg.jpg) |
+| ![Menu](screenshots/01-menu.png) | ![Read result](screenshots/02-read-result.png) | ![Write config](screenshots/03-write-cfg.png) |
 
 | Material picker                                        | Color picker                                     | Write success                                      |
 |--------------------------------------------------------|--------------------------------------------------|----------------------------------------------------|
-| ![Material picker](screenshots/04-material-picker.jpg) | ![Color picker](screenshots/05-color-picker.jpg) | ![Write success](screenshots/06-write-success.jpg) |
+| ![Material picker](screenshots/04-material-picker.png) | ![Color picker](screenshots/05-color-picker.png) | ![Write success](screenshots/06-write-success.png) |
 
 ## What it does
 

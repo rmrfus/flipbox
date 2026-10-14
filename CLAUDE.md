@@ -148,8 +148,10 @@ takes screenshots and presses keys over USB RPC. Scenarios live in `tests/device
 - `nfc-roundtrip.steps` — **writes the tag twice** (PLA Silk / Red, then PA12-CF read back with
   Plus4 to check `#27` and the missing Edit & Write). Ask the user first; needs a spare
   MIFARE Classic 1K tag on the Flipper.
+- `screenshots.steps` — regenerates the six README screenshots (`NN-name.png`, copy into
+  `screenshots/`). Writes PLA Silk / Red to the tag, so the same rule applies.
 
-Both stash `settings.bin` and restore it afterwards. Before deploying, `flipper.py info` gives the
+All scenarios stash `settings.bin` and restore it afterwards. Before deploying, `flipper.py info` gives the
 device's API major; build with the matching SDK (see the CI matrix for the zip URLs).
 
 ## Pitfalls
