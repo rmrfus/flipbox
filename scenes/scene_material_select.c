@@ -2,30 +2,24 @@
 
 static void material_cb(void* context, uint32_t index) {
     FlipBoxApp* app = context;
-    const QidiMaterialGroup* g = &qidi_material_groups[app->group_idx];
-    app->mat_idx = g->indices[index];
+    app->mat_idx = (uint8_t)index;
     scene_manager_search_and_switch_to_previous_scene(app->scene_manager, FlipBoxSceneWriteCfg);
 }
 
 void flipbox_scene_material_select_on_enter(void* context) {
     FlipBoxApp* app = context;
-    const QidiMaterialGroup* g = &qidi_material_groups[app->group_idx];
 
     submenu_reset(app->submenu);
-    submenu_set_header(app->submenu, g->name);
+    submenu_set_header(app->submenu, qidi_group_names[app->group_idx]);
 
-    // Find which entry in this group matches current mat_idx (for pre-selection)
-    uint8_t selected = 0;
-    for(uint8_t i = 0; i < g->count; i++) {
-        submenu_add_item(
-            app->submenu,
-            qidi_materials[g->indices[i]].name,
-            i,
-            material_cb,
-            app);
-        if(g->indices[i] == app->mat_idx) selected = i;
+    // Item index is the qidi_materials[] index; selection falls back to the
+    // first item when the current material is in another group
+    for(uint8_t i = 0; i < QIDI_MATERIAL_COUNT; i++) {
+        const QidiMaterialInfo* m = &qidi_materials[i];
+        if(m->group != app->group_idx || !qidi_material_on_printer(m, app->printer)) continue;
+        submenu_add_item(app->submenu, m->name, i, material_cb, app);
     }
-    submenu_set_selected_item(app->submenu, selected);
+    submenu_set_selected_item(app->submenu, app->mat_idx);
     view_dispatcher_switch_to_view(app->view_dispatcher, FlipBoxViewSubmenu);
 }
 

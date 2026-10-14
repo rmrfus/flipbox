@@ -1,51 +1,99 @@
 #include "qidi_tag.h"
-#include <string.h>
+#include <furi.h>
 
 const uint8_t QIDI_KEY_PRIMARY[6] = {0xD3, 0xF7, 0xD3, 0xF7, 0xD3, 0xF7};
 const uint8_t QIDI_KEY_DEFAULT[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
-// Codes are the actual hex values written to the tag.
-// Wiki documents them in decimal; these are the converted hex equivalents.
-// Source: https://wiki.qidi3d.com/en/QIDIBOX/RFID
-// Codes 9,10,15-17,20-23,28-29,35-36,46,48 are unassigned in the wiki.
-const QidiMaterialInfo qidi_materials[QIDI_MATERIAL_COUNT] = {
-    {  1, "PLA Rapido"        },
-    {  2, "PLA Matte"         },
-    {  3, "PLA Metal"         },
-    {  4, "PLA Silk"          },
-    {  5, "PLA-CF"            },
-    {  6, "PLA-Wood"          },
-    {  7, "PLA Basic"         },
-    {  8, "PLA Matte Basic"   },
-    { 11, "ABS"               },
-    { 12, "ABS-GF"            },
-    { 13, "ABS-Metal"         },
-    { 14, "ABS-Odorless"      },
-    { 18, "ASA"               },
-    { 19, "ASA-AERO"          },
-    { 24, "UltraPA"           },
-    { 25, "PA-CF"             },
-    { 26, "UltraPA-CF25"      },
-    { 27, "PA12-CF"           },
-    { 30, "PAHT-CF"           },
-    { 31, "PAHT-GF"           },
-    { 32, "Support For PAHT"  },
-    { 33, "Support For PET/PA"},
-    { 34, "PC/ABS-FR"         },
-    { 37, "PET-CF"            },
-    { 38, "PET-GF"            },
-    { 39, "PETG Basic"        },
-    { 40, "PETG Tough"        },
-    { 41, "PETG Rapido"       },
-    { 42, "PETG-CF"           },
-    { 43, "PETG-GF"           },
-    { 44, "PPS-CF"            },
-    { 45, "PETG Translucent"  },
-    { 47, "PVA"               },
-    { 49, "TPU-Aero"          },
-    { 50, "TPU"               },
+const char* const qidi_printer_names[QidiPrinterCount] = {
+    [QidiPrinterQ2]    = "Q2",
+    [QidiPrinterMax4]  = "Max4",
+    [QidiPrinterPlus4] = "Plus4",
 };
 
+const char* const qidi_group_names[QidiGroupCount] = {
+    [QidiGroupPla]     = "PLA",
+    [QidiGroupAbs]     = "ABS",
+    [QidiGroupAsa]     = "ASA",
+    [QidiGroupPa]      = "PA / Nylon",
+    [QidiGroupPet]     = "PET / PETG",
+    [QidiGroupSupport] = "Support",
+    [QidiGroupFlex]    = "TPU / Flex",
+    [QidiGroupOther]   = "Other",
+};
+
+#define Q2    QIDI_PRINTER_BIT(QidiPrinterQ2)
+#define MAX4  QIDI_PRINTER_BIT(QidiPrinterMax4)
+#define PLUS4 QIDI_PRINTER_BIT(QidiPrinterPlus4)
+#define ALL   (Q2 | MAX4 | PLUS4)
+
+// Names and codes from officiall_filas_list.cfg in QIDI's firmware repos:
+//   Q2    — github.com/QIDITECH/QIDI_Q2    (V1.1.1, 2026-01)
+//   Max4  — github.com/QIDITECH/QIDI_MAX4  (2026-08)
+//   Plus4 — github.com/QIDITECH/QIDI_PLUS4 (V1.7.1, 2025-08)
+// A code may map to a different name per printer (e.g. 25 is PA-CF on Q2/Max4
+// but PA12-CF on Plus4), hence one row per (code, name) with a printer mask.
+// Plus4's "PETG-Though" (40) and "TPU-AERO" (49) are treated as spelling
+// variants of the Q2/Max4 names. Sorted by code; menus keep this order.
+const QidiMaterialInfo qidi_materials[] = {
+    {  1, QidiGroupPla,     Q2 | MAX4, "PLA Rapido"         },
+    {  1, QidiGroupPla,     PLUS4,     "PLA"                },
+    {  2, QidiGroupPla,     ALL,       "PLA Matte"          },
+    {  3, QidiGroupPla,     ALL,       "PLA Metal"          },
+    {  4, QidiGroupPla,     ALL,       "PLA Silk"           },
+    {  5, QidiGroupPla,     ALL,       "PLA-CF"             },
+    {  6, QidiGroupPla,     ALL,       "PLA-Wood"           },
+    {  7, QidiGroupPla,     ALL,       "PLA Basic"          },
+    {  8, QidiGroupPla,     ALL,       "PLA Matte Basic"    },
+    { 10, QidiGroupSupport, Q2 | MAX4, "Support For PLA"    },
+    { 11, QidiGroupAbs,     Q2 | MAX4, "ABS Rapido"         },
+    { 11, QidiGroupAbs,     PLUS4,     "ABS"                },
+    { 12, QidiGroupAbs,     ALL,       "ABS-GF"             },
+    { 13, QidiGroupAbs,     ALL,       "ABS-Metal"          },
+    { 14, QidiGroupAbs,     ALL,       "ABS-Odorless"       },
+    { 15, QidiGroupFlex,    MAX4,      "TPU-GF"             },
+    { 18, QidiGroupAsa,     ALL,       "ASA"                },
+    { 19, QidiGroupAsa,     ALL,       "ASA-Aero"           },
+    { 20, QidiGroupAsa,     Q2 | MAX4, "ASA-CF"             },
+    { 23, QidiGroupOther,   Q2 | MAX4, "PC"                 },
+    { 24, QidiGroupPa,      ALL,       "UltraPA"            },
+    { 25, QidiGroupPa,      Q2 | MAX4, "PA-CF"              },
+    { 25, QidiGroupPa,      PLUS4,     "PA12-CF"            },
+    { 26, QidiGroupPa,      ALL,       "UltraPA-CF25"       },
+    { 27, QidiGroupPa,      Q2 | MAX4, "PA12-CF"            },
+    { 30, QidiGroupPa,      ALL,       "PAHT-CF"            },
+    { 31, QidiGroupPa,      ALL,       "PAHT-GF"            },
+    { 32, QidiGroupSupport, ALL,       "Support For PAHT"   },
+    { 33, QidiGroupSupport, ALL,       "Support For PET/PA" },
+    { 34, QidiGroupOther,   ALL,       "PC/ABS-FR"          },
+    { 35, QidiGroupFlex,    Q2 | MAX4, "TPEE"               },
+    { 36, QidiGroupFlex,    Q2 | MAX4, "PEBA"               },
+    { 37, QidiGroupPet,     ALL,       "PET-CF"             },
+    { 38, QidiGroupPet,     ALL,       "PET-GF"             },
+    { 39, QidiGroupPet,     ALL,       "PETG Basic"         },
+    { 40, QidiGroupPet,     ALL,       "PETG-Tough"         },
+    { 41, QidiGroupPet,     Q2 | MAX4, "PETG Rapido"        },
+    { 41, QidiGroupPet,     PLUS4,     "PETG"               },
+    { 42, QidiGroupPet,     Q2 | MAX4, "PETG-CF"            },
+    { 43, QidiGroupPet,     Q2 | MAX4, "PETG-GF"            },
+    { 44, QidiGroupOther,   ALL,       "PPS-CF"             },
+    { 45, QidiGroupPet,     ALL,       "PETG Translucent"   },
+    { 46, QidiGroupOther,   Q2 | MAX4, "PPS-GF"             },
+    { 47, QidiGroupOther,   ALL,       "PVA"                },
+    { 48, QidiGroupFlex,    Q2 | MAX4, "TPU-AERO 64D"       },
+    { 49, QidiGroupFlex,    ALL,       "TPU-Aero"           },
+    { 50, QidiGroupFlex,    Q2 | MAX4, "TPU 95A-HF"         },
+    { 50, QidiGroupFlex,    PLUS4,     "TPU"                },
+};
+_Static_assert(
+    sizeof(qidi_materials) / sizeof(qidi_materials[0]) == QIDI_MATERIAL_COUNT,
+    "QIDI_MATERIAL_COUNT does not match qidi_materials[]");
+
+#undef Q2
+#undef MAX4
+#undef PLUS4
+#undef ALL
+
+// Same 24-entry palette on every printer ([colordict] in the cfg)
 const QidiColorInfo qidi_colors[QIDI_COLOR_COUNT] = {
     {  1, "White",       0xFAFAFA },
     {  2, "Black",       0x060606 },
@@ -73,30 +121,26 @@ const QidiColorInfo qidi_colors[QIDI_COLOR_COUNT] = {
     { 24, "Bronze",      0xB87F2B },
 };
 
+// [vendor_list] in the cfg: 0 = Generic, 1 = QIDI
 const QidiManufacturerInfo qidi_manufacturers[QIDI_MFR_COUNT] = {
     { 0x01, "QIDI"    },
-    { 0x02, "Generic" },
+    { 0x00, "Generic" },
 };
 
-// Material group index → indices into qidi_materials[]
-// qidi_materials[] order: PLA(0-7) ABS(8-11) ASA(12-13) PA(14-19)
-//   Support(20-21) PC(22) PET/PETG(23-29) PPS(30) PETGTrans(31) PVA(32) TPU(33-34)
-const QidiMaterialGroup qidi_material_groups[QIDI_GROUP_COUNT] = {
-    { "PLA",        { 0,  1,  2,  3,  4,  5,  6,  7           }, 8 },
-    { "ABS",        { 8,  9, 10, 11                            }, 4 },
-    { "ASA",        {12, 13                                    }, 2 },
-    { "PA / Nylon", {14, 15, 16, 17, 18, 19                   }, 6 },
-    { "PET / PETG", {23, 24, 25, 26, 27, 28, 29, 31           }, 8 },
-    { "Support",    {20, 21                                    }, 2 },
-    { "TPU",        {33, 34                                    }, 2 },
-    { "Other",      {22, 30, 32                                }, 3 },
-};
-
-int qidi_material_idx_by_code(uint8_t code) {
+int qidi_material_idx_by_code(QidiPrinter printer, uint8_t code) {
     for(int i = 0; i < QIDI_MATERIAL_COUNT; i++) {
-        if(qidi_materials[i].code == code) return i;
+        if(qidi_materials[i].code == code && qidi_material_on_printer(&qidi_materials[i], printer))
+            return i;
     }
     return -1;
+}
+
+uint8_t qidi_material_first_idx(QidiPrinter printer) {
+    for(uint8_t i = 0; i < QIDI_MATERIAL_COUNT; i++) {
+        if(qidi_material_on_printer(&qidi_materials[i], printer)) return i;
+    }
+    // Every printer has at least one material in the table
+    furi_crash("no materials for printer");
 }
 
 int qidi_color_idx_by_code(uint8_t code) {
@@ -113,17 +157,17 @@ int qidi_mfr_idx_by_code(uint8_t code) {
     return -1;
 }
 
-const char* qidi_material_name(uint8_t code) {
-    int idx = qidi_material_idx_by_code(code);
-    return (idx >= 0) ? qidi_materials[idx].name : "Unknown";
+const char* qidi_material_name(QidiPrinter printer, uint8_t code) {
+    int idx = qidi_material_idx_by_code(printer, code);
+    return (idx >= 0) ? qidi_materials[idx].name : NULL;
 }
 
 const char* qidi_color_name(uint8_t code) {
     int idx = qidi_color_idx_by_code(code);
-    return (idx >= 0) ? qidi_colors[idx].name : "Unknown";
+    return (idx >= 0) ? qidi_colors[idx].name : NULL;
 }
 
 const char* qidi_mfr_name(uint8_t code) {
     int idx = qidi_mfr_idx_by_code(code);
-    return (idx >= 0) ? qidi_manufacturers[idx].name : "Unknown";
+    return (idx >= 0) ? qidi_manufacturers[idx].name : NULL;
 }

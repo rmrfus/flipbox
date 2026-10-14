@@ -30,8 +30,8 @@ bool flipbox_scene_write_on_event(void* context, SceneManagerEvent event) {
             snprintf(
                 app->text_buf, sizeof(app->text_buf),
                 "Written!\n%s / %s",
-                qidi_material_name(qidi_materials[app->mat_idx].code),
-                qidi_color_name(qidi_colors[app->col_idx].code));
+                qidi_materials[app->mat_idx].name,
+                qidi_colors[app->col_idx].name);
             popup_set_header(app->popup, "Success!", 64, 4, AlignCenter, AlignTop);
             popup_set_text(app->popup, app->text_buf, 64, 36, AlignCenter, AlignCenter);
             notification_message(app->notification, &sequence_success);
@@ -52,5 +52,7 @@ bool flipbox_scene_write_on_event(void* context, SceneManagerEvent event) {
 
 void flipbox_scene_write_on_exit(void* context) {
     FlipBoxApp* app = context;
+    // Backing out must not leave the write armed for the next tag
+    nfc_worker_cancel(app->worker);
     popup_reset(app->popup);
 }

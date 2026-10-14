@@ -2,11 +2,33 @@
 #include <stdio.h>
 
 typedef enum {
+    CfgItemPrinter,
     CfgItemMaterial,
     CfgItemColor,
     CfgItemManufacturer,
     CfgItemWriteNow,
 } CfgItem;
+
+// Valid between on_enter and on_exit; printer change rewrites its text
+static VariableItem* material_item;
+
+static void material_text_update(FlipBoxApp* app) {
+    // OK opens submenu, append "..." to signal that
+    snprintf(app->text_buf, sizeof(app->text_buf), "%s ...", qidi_materials[app->mat_idx].name);
+    variable_item_set_current_value_text(material_item, app->text_buf);
+}
+
+// Called on left/right for Printer
+static void printer_change_cb(VariableItem* item) {
+    FlipBoxApp* app = variable_item_get_context(item);
+    app->printer = variable_item_get_current_value_index(item);
+    variable_item_set_current_value_text(item, qidi_printer_names[app->printer]);
+    // Keep the material when the new printer has the same table row, else reset
+    if(!qidi_material_on_printer(&qidi_materials[app->mat_idx], app->printer)) {
+        app->mat_idx = qidi_material_first_idx(app->printer);
+    }
+    material_text_update(app);
+}
 
 // Called on left/right for Manufacturer
 static void mfr_change_cb(VariableItem* item) {
@@ -18,7 +40,14 @@ static void mfr_change_cb(VariableItem* item) {
 // Called on OK press for any row
 static void cfg_enter_cb(void* context, uint32_t index) {
     FlipBoxApp* app = context;
+    // Return to this row when coming back from a picker. Never remember
+    // Write Tag: a later entry (e.g. Read -> Edit & Write) must not land on it
+    if(index == CfgItemMaterial || index == CfgItemColor) {
+        scene_manager_set_scene_state(app->scene_manager, FlipBoxSceneWriteCfg, index);
+    }
     if(index == CfgItemMaterial) {
+        // Open the group picker on the current material's group
+        app->group_idx = qidi_materials[app->mat_idx].group;
         scene_manager_next_scene(app->scene_manager, FlipBoxSceneMaterialGroup);
     } else if(index == CfgItemColor) {
         scene_manager_next_scene(app->scene_manager, FlipBoxSceneColorSelect);
@@ -34,15 +63,19 @@ void flipbox_scene_write_cfg_on_enter(void* context) {
 
     VariableItem* item;
 
-    // Material — OK opens submenu, append "..." to signal that
-    snprintf(app->text_buf, sizeof(app->text_buf), "%s ...", qidi_materials[app->mat_idx].name);
-    item = variable_item_list_add(list, "Material", 0, NULL, NULL);
-    variable_item_set_current_value_text(item, app->text_buf);
+    // Printer — left/right cycles, picks the material code table
+    item = variable_item_list_add(list, "Printer", QidiPrinterCount, printer_change_cb, app);
+    variable_item_set_current_value_index(item, app->printer);
+    variable_item_set_current_value_text(item, qidi_printer_names[app->printer]);
 
-    // Color — same, separate buffer so Material text isn't overwritten
-    snprintf(app->text_buf2, sizeof(app->text_buf2), "%s ...", qidi_colors[app->col_idx].name);
+    // Material — OK opens group submenu
+    material_item = variable_item_list_add(list, "Material", 0, NULL, NULL);
+    material_text_update(app);
+
+    // Color — OK opens submenu; value text is copied, so text_buf can be reused
+    snprintf(app->text_buf, sizeof(app->text_buf), "%s ...", qidi_colors[app->col_idx].name);
     item = variable_item_list_add(list, "Color", 0, NULL, NULL);
-    variable_item_set_current_value_text(item, app->text_buf2);
+    variable_item_set_current_value_text(item, app->text_buf);
 
     // Manufacturer — left/right cycles, no submenu
     item = variable_item_list_add(list, "Maker", QIDI_MFR_COUNT, mfr_change_cb, app);
@@ -54,6 +87,8 @@ void flipbox_scene_write_cfg_on_enter(void* context) {
     variable_item_set_current_value_text(item, ">");
 
     variable_item_list_set_enter_callback(list, cfg_enter_cb, app);
+    variable_item_list_set_selected_item(
+        list, scene_manager_get_scene_state(app->scene_manager, FlipBoxSceneWriteCfg));
 
     view_dispatcher_switch_to_view(app->view_dispatcher, FlipBoxViewVariableItemList);
 }
@@ -67,4 +102,5 @@ bool flipbox_scene_write_cfg_on_event(void* context, SceneManagerEvent event) {
 void flipbox_scene_write_cfg_on_exit(void* context) {
     FlipBoxApp* app = context;
     variable_item_list_reset(app->var_item_list);
+    material_item = NULL;
 }

@@ -8,8 +8,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        # A FAP only loads on firmware with the same API major version, so one
+        # build per major. SDKs are pinned so a tag always ships the same set;
+        # bump `sdk` when a newer firmware with that major is out.
+        include:
+          - api: 87  # OFW 1.4.x, Momentum mntm-012
+            sdk: 1.4.3
+          - api: 88  # OFW 1.5.x, Unleashed unlshd-090+, RogueMaster RM0713+
+            sdk: 1.5.1-rc
     steps:
       - uses: actions/checkout@v4
 
@@ -20,17 +29,43 @@ jobs:
       - name: Install ufbt
         run: pip install ufbt
 
+      - name: Fetch SDK
+        run: ufbt update --hw-target=f7 --url=https://update.flipperzero.one/builds/firmware/${{ matrix.sdk }}/flipper-z-f7-sdk-${{ matrix.sdk }}.zip
+
       - name: Build
-        run: UFBT_SDK_CHANNEL=release ufbt
+        run: ufbt
+
+      - name: Name by API major
+        id: fap
+        run: |
+          api=$(awk -F, '$1 == "Version" { split($3, v, "."); print v[1]; exit }' \
+            ~/.ufbt/current/sdk_headers/f7_sdk/targets/f7/api_symbols.csv)
+          if [ "$api" != "${{ matrix.api }}" ]; then
+            echo "::error::SDK ${{ matrix.sdk }} has API major '$api', expected ${{ matrix.api }}"
+            exit 1
+          fi
+          cp dist/flipbox.fap "dist/flipbox-api${api}.fap"
+          echo "path=dist/flipbox-api${api}.fap" >> "$GITHUB_OUTPUT"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: flipbox.fap
-          path: dist/flipbox.fap
+          name: flipbox-api${{ matrix.api }}
+          path: ${{ steps.fap.outputs.path }}
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
 
       - name: Release
-        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/flipbox.fap
+          files: dist/*.fap

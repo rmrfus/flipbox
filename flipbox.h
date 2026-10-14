@@ -44,16 +44,18 @@ typedef struct {
 
     NfcWorker*        worker;
 
+    // Selects the code table for both read and write; saved on exit
+    QidiPrinter printer;
+
     // write config state
-    uint8_t mat_idx;   // index into qidi_materials[]
+    uint8_t mat_idx;   // index into qidi_materials[], always available on printer
     uint8_t col_idx;   // index into qidi_colors[]
     uint8_t mfr_idx;   // index into qidi_manufacturers[]
-    uint8_t group_idx; // index into qidi_material_groups[]
+    uint8_t group_idx; // QidiGroup being browsed in material picker
 
     // last read result (for display in popup)
     QidiTagData last_read;
     bool        last_read_valid;
 
     char text_buf[128];
-    char text_buf2[128];
 } FlipBoxApp;

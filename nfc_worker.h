@@ -25,5 +25,10 @@ void       nfc_worker_free(NfcWorker* worker);
 void nfc_worker_start(NfcWorker* worker, NfcWorkerCallback cb, void* context);
 void nfc_worker_stop(NfcWorker* worker);
 
+// A new request replaces any pending one; the result of a replaced or
+// cancelled request is never delivered
 void nfc_worker_read(NfcWorker* worker);
 void nfc_worker_write(NfcWorker* worker, const QidiTagData* tag_data);
+// Drop the pending request; an operation already on the air finishes, but its
+// result is discarded and a write skips its fallback-key attempt
+void nfc_worker_cancel(NfcWorker* worker);

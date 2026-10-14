@@ -1,5 +1,30 @@
 #include "flipbox.h"
 
+#include <storage/storage.h>
+#include <toolbox/saved_struct.h>
+
+#define SETTINGS_PATH    APP_DATA_PATH("settings.bin")
+#define SETTINGS_MAGIC   0xFB
+#define SETTINGS_VERSION 1
+
+typedef struct {
+    uint8_t printer; // QidiPrinter
+} FlipBoxSettings;
+
+static QidiPrinter flipbox_settings_load(void) {
+    FlipBoxSettings s;
+    if(saved_struct_load(SETTINGS_PATH, &s, sizeof(s), SETTINGS_MAGIC, SETTINGS_VERSION) &&
+       s.printer < QidiPrinterCount) {
+        return s.printer;
+    }
+    return QidiPrinterQ2;
+}
+
+static void flipbox_settings_save(QidiPrinter printer) {
+    FlipBoxSettings s = {.printer = printer};
+    saved_struct_save(SETTINGS_PATH, &s, sizeof(s), SETTINGS_MAGIC, SETTINGS_VERSION);
+}
+
 // Single worker callback — routes NFC events to view_dispatcher as custom events
 static void flipbox_worker_cb(NfcWorkerResult result, void* context) {
     FlipBoxApp* app = context;
@@ -39,8 +64,9 @@ static FlipBoxApp* flipbox_app_alloc(void) {
     FlipBoxApp* app = malloc(sizeof(FlipBoxApp));
     memset(app, 0, sizeof(FlipBoxApp));
 
-    // Default config: PLA / White / QIDI
-    app->mat_idx = 0;
+    // Default config: saved printer, its first material (PLA) / White / QIDI
+    app->printer = flipbox_settings_load();
+    app->mat_idx = qidi_material_first_idx(app->printer);
     app->col_idx = 0;
     app->mfr_idx = 0;
 
@@ -83,6 +109,8 @@ static FlipBoxApp* flipbox_app_alloc(void) {
 
 static void flipbox_app_free(FlipBoxApp* app) {
     furi_assert(app);
+
+    flipbox_settings_save(app->printer);
 
     nfc_worker_stop(app->worker);
     nfc_worker_free(app->worker);

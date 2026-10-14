@@ -4,6 +4,11 @@ Offline copy of https://wiki.qidi3d.com/en/QIDIBOX/RFID (retrieved 2025-12).
 
 > **Note:** the official spec is incomplete in places. See `CLAUDE.md` for corrections from
 > reverse-engineered firmware (`box_rfid.py`).
+>
+> The material table below is outdated (re-checked 2026-10: the wiki still has not changed it).
+> Printers resolve codes with their own `officiall_filas_list.cfg`, which differs per model and
+> includes newer materials; see the per-printer table in `README.md`. Manufacturer code 0 is
+> Generic in that cfg.
 
 ---
 

@@ -1,6 +1,13 @@
 #include "../flipbox.h"
 #include <stdio.h>
 
+// Unknown codes are shown as "#<code>" so foreign tags still say something
+static const char* name_or_code(const char* name, uint8_t code, char* buf, size_t size) {
+    if(name) return name;
+    snprintf(buf, size, "#%u", code);
+    return buf;
+}
+
 static void read_btn_cb(GuiButtonType type, InputType input_type, void* context) {
     if(input_type != InputTypeShort) return;
     FlipBoxApp* app = context;
@@ -29,20 +36,28 @@ bool flipbox_scene_read_on_event(void* context, SceneManagerEvent event) {
     if(event.type == SceneManagerEventTypeCustom) {
         if(event.event == FlipBoxCustomEventReadSuccess) {
             const QidiTagData* d = &app->last_read;
+            const char* mat_name = qidi_material_name(app->printer, d->material_code);
+            const char* col_name = qidi_color_name(d->color_code);
+            char mat[8], col[8], mfr[8];
             snprintf(
                 app->text_buf, sizeof(app->text_buf),
                 "Material: %s\nColor: %s\nMfr: %s",
-                qidi_material_name(d->material_code),
-                qidi_color_name(d->color_code),
-                qidi_mfr_name(d->manufacturer_code));
+                name_or_code(mat_name, d->material_code, mat, sizeof(mat)),
+                name_or_code(col_name, d->color_code, col, sizeof(col)),
+                name_or_code(
+                    qidi_mfr_name(d->manufacturer_code), d->manufacturer_code, mfr, sizeof(mfr)));
 
             widget_reset(app->widget);
             widget_add_string_multiline_element(
                 app->widget, 64, 28, AlignCenter, AlignCenter, FontSecondary, app->text_buf);
             widget_add_button_element(
                 app->widget, GuiButtonTypeLeft, "Retry", read_btn_cb, app);
-            widget_add_button_element(
-                app->widget, GuiButtonTypeRight, "Edit & Write", read_btn_cb, app);
+            // Editing would silently replace a code the selected printer's
+            // table doesn't know, so only offer it when both are known
+            if(mat_name && col_name) {
+                widget_add_button_element(
+                    app->widget, GuiButtonTypeRight, "Edit & Write", read_btn_cb, app);
+            }
 
             view_dispatcher_switch_to_view(app->view_dispatcher, FlipBoxViewWidget);
             notification_message(app->notification, &sequence_success);
@@ -62,23 +77,14 @@ bool flipbox_scene_read_on_event(void* context, SceneManagerEvent event) {
         } else if(event.event == FlipBoxCustomEventReadEditTag) {
             const QidiTagData* d = &app->last_read;
 
-            int mi = qidi_material_idx_by_code(d->material_code);
+            // The button exists only when material and color are known
+            int mi = qidi_material_idx_by_code(app->printer, d->material_code);
             int ci = qidi_color_idx_by_code(d->color_code);
             int ri = qidi_mfr_idx_by_code(d->manufacturer_code);
-            app->mat_idx = (mi >= 0) ? (uint8_t)mi : 0;
-            app->col_idx = (ci >= 0) ? (uint8_t)ci : 0;
+            furi_check(mi >= 0 && ci >= 0);
+            app->mat_idx = (uint8_t)mi;
+            app->col_idx = (uint8_t)ci;
             app->mfr_idx = (ri >= 0) ? (uint8_t)ri : 0;
-
-            // find the group containing mat_idx so MaterialGroup opens at the right entry
-            app->group_idx = 0;
-            for(uint8_t g = 0; g < QIDI_GROUP_COUNT; g++) {
-                for(uint8_t k = 0; k < qidi_material_groups[g].count; k++) {
-                    if(qidi_material_groups[g].indices[k] == app->mat_idx) {
-                        app->group_idx = g;
-                        break;
-                    }
-                }
-            }
 
             scene_manager_next_scene(app->scene_manager, FlipBoxSceneWriteCfg);
             consumed = true;
@@ -93,6 +99,7 @@ bool flipbox_scene_read_on_event(void* context, SceneManagerEvent event) {
 
 void flipbox_scene_read_on_exit(void* context) {
     FlipBoxApp* app = context;
+    nfc_worker_cancel(app->worker);
     popup_reset(app->popup);
     widget_reset(app->widget);
 }
