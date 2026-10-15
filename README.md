@@ -21,7 +21,8 @@ The tag stores only numeric codes, and each printer model maps them to names wit
 so pick your printer first (`Write Tag → Printer`, left/right). The choice is remembered and also
 used to name materials when reading.
 
-Works with any MIFARE Classic 1K spool tag (FM11RF08S or compatible).
+Works with any MIFARE Classic 1K spool tag (FM11RF08S or compatible); see [Tags](#tags) for
+which blank stickers to buy.
 
 ## Compatibility
 
@@ -83,24 +84,134 @@ The SDK defaults to the official release channel. To build for the next API (e.g
 direnv exec . ufbt update --channel=rc
 ```
 
-## Tag format
+## Tags
 
-Chip: FM11RF08S (MIFARE Classic 1K), 13.56 MHz, ISO 14443-A.
+### Buying tags
+
+Use **MIFARE Classic 1K** stickers. Listings call them "MIFARE Classic 1K", "MF1 S50", "S50",
+"M1 1K" or "Fudan F08", with ISO 14443A and 13.56 MHz. Blank tags ship with the factory key
+`FF:FF:FF:FF:FF:FF` on every sector. The box reads such tags and FlipBox writes them as they
+are, with no formatting.
+
+Known good: BABIQT "MF Classic 1K Tags S50 RFID Stickers", 1 inch (25 mm) round,
+self-adhesive, 50 pcs. The listing is gone (2026-10); search for the same description.
+
+These do **not** work, even when sold as "NFC tags":
+
+| Listing says                                    | What it is                   | Why it fails                                                |
+|-------------------------------------------------|------------------------------|-------------------------------------------------------------|
+| NTAG213 / NTAG215 / NTAG216, Ultralight, Type 2 | NXP NTAG / MIFARE Ultralight | No sectors or keys, so the box's MIFARE Classic login fails |
+| 125 kHz, EM4100, EM4200, TK4100, T5577          | Low-frequency RFID           | Different frequency                                         |
+| ICODE, ISO 15693                                | Vicinity tags                | Different protocol                                          |
+| DESFire                                         | NXP MIFARE DESFire           | AES/3DES security instead of MIFARE Classic Crypto1         |
+
+Most generic "NFC stickers" are NTAG21x, so check the chip name in the listing.
+
+Untested, but block 4 behaves the same on them: MIFARE Classic 4K (S70) and the UID-changeable
+"magic" 1K variants (Gen1a, CUID). There is no reason to pick them.
+
+Physical:
+
+- **Size.** A 1 inch (25 mm) round sticker has a large enough antenna. Smaller tags have
+  smaller antennas and a shorter read range.
+- **Heat.** The box dries filament at up to 149 °F (65 °C), the highest `box_max_temp` in all
+  three printers' tables. Check that the sticker's operating temperature covers it.
+- **Metal.** Do not stick a plain tag on metal or metallized film; the metal detunes the
+  antenna. Use an anti-metal (ferrite-backed) tag there.
+
+### Where to stick them
+
+- **Both flanges.** A box has only two readers: one between slots 1 and 2, one between slots
+  3 and 4. A spool in slot 1 or 3 is read from one side, a spool in slot 2 or 4 from the other
+  side. One tag on each flange makes the spool readable in any slot. (Reader positions:
+  [r/QIDI](https://www.reddit.com/r/QIDI/comments/1slq7u7/today_i_learnedqidi_box_rfid_placement/),
+  from a teardown and testing. They also match the two `box_rfid card_reader_N` objects per box
+  that the printer's `box_config.py` creates.)
+- **Position.** Put the tag on the outer face of the flange, about halfway between the hub and
+  the rim. A tag centered about 1.2–1.4 in (30–35 mm) in from the outer edge reads reliably.
+- **Cardboard spools.** QIDI says the box does not take them without a spool adapter ring. Put
+  the tags on the ring. Some printable rings mark the tag spot, e.g.
+  [this parametric adaptor](https://makerworld.com/en/models/2669018-parametric-qidi-rfid-cardboard-spool-adaptor).
+
+### Checking a tag
+
+Read it with the Flipper's own NFC app (`NFC → Read`). It should identify the tag as
+MIFARE Classic 1K. A tag on factory keys shows `Keys Found: 32/32`, keys A and B of all 16
+sectors. `More → Info` shows the ISO 14443-A identifiers, which tell the families apart:
+
+| Tag                  | ATQA    | SAK  |
+|----------------------|---------|------|
+| MIFARE Classic 1K    | `00 04` | `08` |
+| MIFARE Classic 4K    | `00 02` | `18` |
+| NTAG21x / Ultralight | `00 44` | `00` |
+
+### Chip and memory
+
+QIDI's own spool tags use the Fudan **FM11RF08S**, a MIFARE Classic 1K compatible chip:
+ISO/IEC 14443-A, 13.56 MHz, 106 kbit/s, MIFARE Classic (Crypto1) authentication.
+
+The 1 KB EEPROM is 16 sectors × 4 blocks × 16 bytes:
+
+| Block                         | Content                                                     | Access                     |
+|-------------------------------|-------------------------------------------------------------|----------------------------|
+| 0                             | UID and manufacturer data                                   | Read-only on genuine chips |
+| 3, 7, 11, … 63 (last of each) | Sector trailer: key A (6 B), access bits (4 B), key B (6 B) | Per access bits            |
+| All others (47 blocks)        | User data, 752 bytes                                        | Read/write with the key    |
+
+The box uses 3 bytes of block 4. The rest of the tag is ignored.
+
+### Data layout
 
 Data is in **Sector 1, Block 0** (absolute block 4):
 
 | Byte     | Field             | Notes                     |
 |----------|-------------------|---------------------------|
-| `[0]`    | Material code     | 1–50, see table below     |
+| `[0]`    | Material code     | 1–99 accepted, see below  |
 | `[1]`    | Color code        | 1–24                      |
 | `[2]`    | Manufacturer code | 1 = QIDI, 0 = Generic     |
 | `[3–15]` | —                 | Unused, written as `0x00` |
 
-Auth keys tried in order:
-1. `D3:F7:D3:F7:D3:F7` (QIDI primary)
-2. `FF:FF:FF:FF:FF:FF` (factory default)
+The values are plain binary bytes, not ASCII text. The QIDI wiki lists the codes in decimal, so
+ABS (code 11) is stored as the byte `0x0B`, not as the characters `"11"`.
 
 > **Note on manufacturer byte:** the stock QIDI Box firmware ignores `byte[2]` and hardcodes vendor = 1 internally. Community firmware replacements read it, using the printer's `[vendor_list]` (0 = Generic, 1 = QIDI). FlipBox 0.1.x wrote Generic as `2`; such tags read as `Mfr: #2`.
+
+### Keys
+
+Sector 1 is opened with key A. Two keys are in use:
+
+- `D3:F7:D3:F7:D3:F7` is on QIDI's own tags. Community tools found it; QIDI's docs do not
+  name it. It is the NFC Forum's public key A for NDEF sectors on MIFARE Classic, so it is
+  not a secret.
+- `FF:FF:FF:FF:FF:FF` is the factory default on blank tags.
+
+The box reads both kinds. The box keeps its keys in its MCU firmware, so the order in which
+it tries them is unknown. FlipBox tries `D3:F7…` first, then `FF…`, for both read and write.
+
+FlipBox writes block 4 only. It never writes a sector trailer, so keys and access bits stay as
+they were. A blank tag keeps the factory key and can be rewritten any number of times;
+nothing gets locked.
+
+### How the box reads a tag
+
+- **Hardware.** Each box has its own MCU (STM32F401) with two FM17550 readers on SPI
+  (`box_rfid card_reader_1` and `card_reader_2`). The MCU does the login and reads block 4.
+  Its firmware has no command for reading another block, so the printer never sees the rest of
+  the tag.
+- **Timing.** When a spool is loaded, the printer polls the reader every 0.1 s for up to 30 s.
+  It accepts the tag once two successful reads return identical data.
+- **Validation.** Material must be 1–99 and color 1–24. The manufacturer byte is ignored.
+
+The printer's console shows what went wrong:
+
+| Message                                 | Meaning                                                                                           |
+|-----------------------------------------|---------------------------------------------------------------------------------------------------|
+| `<slot> did not recognize the filament` | No valid read in 30 s: no tag in range, a tag of the wrong type (e.g. NTAG), or the login failed  |
+| `Unrecognized label read in <slot>`     | The tag was read, but a code is out of range, e.g. a blank tag that was never written (all zeros) |
+
+The timing and validation come from the community copy of the Plus4 `box_rfid.py` (see
+[References](#references)). The Q2's compiled module (V1.1.1) has the same messages and the same
+1/24/99 limits; its timing was not checked.
 
 ### Materials
 

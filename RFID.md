@@ -46,6 +46,7 @@ Encoding: raw hex bytes (not ASCII).
 
 **Auth key used by QIDI Box:** `D3 F7 D3 F7 D3 F7` (Key A, Sector 1).
 Fallback: `FF FF FF FF FF FF`.
+(Not on the wiki, re-checked 2026-10: the key comes from community implementations.)
 
 ---
 
