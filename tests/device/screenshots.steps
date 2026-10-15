@@ -10,7 +10,7 @@ rm:/ext/apps_data/flipbox/settings.bin
 start:/ext/apps/NFC/flipbox.fap
 
 # Prepare the tag so the read screen shows a known value
-OK DOWN OK OK DOWN*3 OK   # Write Tag -> Material -> PLA -> PLA Silk
+OK DOWN OK OK DOWN*5 OK   # Write Tag -> Material -> PLA -> PLA Silk
 DOWN OK DOWN*17 OK        # Color -> Red
 DOWN DOWN OK wait:2       # Write Tag
 home

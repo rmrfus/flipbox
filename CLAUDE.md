@@ -115,7 +115,9 @@ QIDI_MAX4 (2026-08), QIDI_PLUS4 V1.7.1 (2025-08).
 once QIDI publishes `officiall_filas_list.cfg` for them.
 
 `qidi_materials[]` has one row per (code, name) with a printer bitmask and a `QidiGroup`; sorted by
-code, menus keep that order. Q2 = 42 rows, Max4 = 43, Plus4 = 32. Groups (`qidi_group_names[]`):
+code except that PLA Basic and PLA Matte Basic lead, and menus keep that order. The first row on a
+printer is its default material (`qidi_material_first_idx`), so PLA Basic on all three; lookups by
+code are linear and don't depend on the order. Q2 = 42 rows, Max4 = 43, Plus4 = 32. Groups (`qidi_group_names[]`):
 PLA, ABS, ASA, PA / Nylon, PET / PETG, Support, TPU / Flex, Other. The group picker hides groups
 with no material on the selected printer.
 
@@ -128,8 +130,10 @@ resets to the printer's first material.
 ## Navigation
 
 - WriteCfg rows: Printer (left/right) / Material ... / Color ... / Maker (left/right) / Write Tag >.
-  The Material/Color row is kept in scene state so returning from a picker lands on it. Write Tag
-  is never remembered, so no entry into WriteCfg puts the cursor one OK away from writing.
+  The row whose OK opened a scene is kept in scene state, so returning from a picker or from Write
+  lands on it (writing several tags in a row is OK, BACK, next tag, OK). Entries from Menu and from
+  Read → Edit & Write reset the state to 0 (Printer), so a fresh entry never starts one OK away
+  from writing.
 - Write flow: Menu → WriteCfg → MaterialGroup → MaterialSelect → (back to WriteCfg via
   `scene_manager_search_and_switch_to_previous_scene`) → ColorSelect → Write
 - Read result offers "Edit & Write" only when material and color are both in the selected

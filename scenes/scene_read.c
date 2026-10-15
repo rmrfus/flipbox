@@ -86,6 +86,8 @@ bool flipbox_scene_read_on_event(void* context, SceneManagerEvent event) {
             app->col_idx = (uint8_t)ci;
             app->mfr_idx = (ri >= 0) ? (uint8_t)ri : 0;
 
+            // Fresh entry starts on the top row, never one OK away from writing
+            scene_manager_set_scene_state(app->scene_manager, FlipBoxSceneWriteCfg, 0);
             scene_manager_next_scene(app->scene_manager, FlipBoxSceneWriteCfg);
             consumed = true;
         }

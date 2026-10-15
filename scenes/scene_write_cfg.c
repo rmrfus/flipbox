@@ -40,11 +40,9 @@ static void mfr_change_cb(VariableItem* item) {
 // Called on OK press for any row
 static void cfg_enter_cb(void* context, uint32_t index) {
     FlipBoxApp* app = context;
-    // Return to this row when coming back from a picker. Never remember
-    // Write Tag: a later entry (e.g. Read -> Edit & Write) must not land on it
-    if(index == CfgItemMaterial || index == CfgItemColor) {
-        scene_manager_set_scene_state(app->scene_manager, FlipBoxSceneWriteCfg, index);
-    }
+    // Return to this row when coming back from the scene it opens. Entries
+    // from Menu and Read reset the state to the top row
+    scene_manager_set_scene_state(app->scene_manager, FlipBoxSceneWriteCfg, index);
     if(index == CfgItemMaterial) {
         // Open the group picker on the current material's group
         app->group_idx = qidi_materials[app->mat_idx].group;

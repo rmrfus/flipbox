@@ -8,6 +8,8 @@ typedef enum {
 static void menu_cb(void* context, uint32_t index) {
     FlipBoxApp* app = context;
     if(index == MenuItemWrite) {
+        // Fresh entry starts on the top row, never one OK away from writing
+        scene_manager_set_scene_state(app->scene_manager, FlipBoxSceneWriteCfg, 0);
         scene_manager_next_scene(app->scene_manager, FlipBoxSceneWriteCfg);
     } else {
         scene_manager_next_scene(app->scene_manager, FlipBoxSceneRead);

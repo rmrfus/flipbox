@@ -33,8 +33,12 @@ const char* const qidi_group_names[QidiGroupCount] = {
 // A code may map to a different name per printer (e.g. 25 is PA-CF on Q2/Max4
 // but PA12-CF on Plus4), hence one row per (code, name) with a printer mask.
 // Plus4's "PETG-Though" (40) and "TPU-AERO" (49) are treated as spelling
-// variants of the Q2/Max4 names. Sorted by code; menus keep this order.
+// variants of the Q2/Max4 names. Sorted by code, except that PLA Basic and
+// PLA Matte Basic lead (the common choice, and the default material); menus
+// keep this order, lookups by code don't depend on it.
 const QidiMaterialInfo qidi_materials[] = {
+    {  7, QidiGroupPla,     ALL,       "PLA Basic"          },
+    {  8, QidiGroupPla,     ALL,       "PLA Matte Basic"    },
     {  1, QidiGroupPla,     Q2 | MAX4, "PLA Rapido"         },
     {  1, QidiGroupPla,     PLUS4,     "PLA"                },
     {  2, QidiGroupPla,     ALL,       "PLA Matte"          },
@@ -42,8 +46,6 @@ const QidiMaterialInfo qidi_materials[] = {
     {  4, QidiGroupPla,     ALL,       "PLA Silk"           },
     {  5, QidiGroupPla,     ALL,       "PLA-CF"             },
     {  6, QidiGroupPla,     ALL,       "PLA-Wood"           },
-    {  7, QidiGroupPla,     ALL,       "PLA Basic"          },
-    {  8, QidiGroupPla,     ALL,       "PLA Matte Basic"    },
     { 10, QidiGroupSupport, Q2 | MAX4, "Support For PLA"    },
     { 11, QidiGroupAbs,     Q2 | MAX4, "ABS Rapido"         },
     { 11, QidiGroupAbs,     PLUS4,     "ABS"                },

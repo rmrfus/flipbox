@@ -9,21 +9,27 @@ start:/ext/apps/NFC/flipbox.fap
 shot:menu           # expect: header "FlipBox: QIDI Box NFC"; Write Tag selected, Read Tag below
 
 OK
-shot:cfg-q2         # expect: defaults; Printer "Q2 >" (no "<"), Material "PLA Rapido ...", Color "White ...", Maker "QIDI >"
-RIGHT
+shot:cfg-q2         # expect: defaults; Printer "Q2 >" (no "<"), Material "PLA Basic ..." (clipped), Color "White ...", Maker "QIDI >"
+DOWN OK OK
+shot:pla-q2         # expect: header "PLA"; PLA Basic selected, then PLA Matte Basic, PLA Rapido (Basic variants lead)
+DOWN DOWN OK        # PLA Rapido (Q2/Max4 only); back on config, cursor on Material
+UP RIGHT
 shot:cfg-max4       # expect: Printer "< Max4 >", Material still PLA Rapido (shared row)
 RIGHT
-shot:cfg-plus4      # expect: Printer "< Plus4" (no ">"), Material reset to "PLA ..." (Plus4 has no PLA Rapido)
+shot:cfg-plus4      # expect: Printer "< Plus4" (no ">"), Material reset to "PLA Basic ..." (Plus4 has no PLA Rapido)
 
 DOWN OK
 shot:groups-plus4   # expect: header "Material"; "PLA ..." selected, "ABS ...", "ASA ..." visible (submenus show 3 rows under the header)
 DOWN DOWN DOWN OK
 shot:pa-plus4       # expect: header "PA / Nylon"; UltraPA, PA12-CF, UltraPA-CF25 visible; no PA-CF (that is code 25 on Q2/Max4 only)
 BACK BACK
-shot:cfg-returned   # expect: back on write config with the cursor on the Material row, Material "PLA ..."
+shot:cfg-returned   # expect: back on write config with the cursor on the Material row, Material "PLA Basic ..."
 
+OK OK
+shot:pla-plus4      # expect: header "PLA"; PLA Basic selected, then PLA Matte Basic, PLA (Plus4's name for code 1)
+DOWN DOWN OK        # "PLA" (Plus4 only); back on config, cursor on Material
 UP LEFT
-shot:max4-set       # expect: Printer "< Max4 >", Material reset to "PLA Rapido ..." (the "PLA" row is Plus4-only)
+shot:max4-set       # expect: Printer "< Max4 >", Material reset to "PLA Basic ..." (the "PLA" row is Plus4-only)
 DOWN OK
 DOWN DOWN DOWN DOWN DOWN DOWN OK
 shot:flex-max4      # expect: header "TPU / Flex"; TPU-GF (Max4 only), TPEE, PEBA visible
@@ -33,7 +39,7 @@ home
 cat:/ext/apps_data/flipbox/settings.bin   # expect: last byte 01 (Max4 persisted)
 start:/ext/apps/NFC/flipbox.fap
 OK
-shot:cfg-restored   # expect: Printer "< Max4 >" restored from settings, Material "PLA Rapido ..."
+shot:cfg-restored   # expect: Printer "< Max4 >" restored from settings, Material "PLA Basic ..."
 
 BACK DOWN OK
 wait:1

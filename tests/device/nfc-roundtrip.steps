@@ -11,28 +11,28 @@ start:/ext/apps/NFC/flipbox.fap
 # Write PLA Silk / Red with Printer Q2, then read it back
 OK                  # Write Tag -> config (Printer Q2, cursor on Printer)
 DOWN OK OK          # Material -> group picker on PLA -> PLA list
-DOWN*3 OK           # PLA Silk; back on config, cursor on Material
+DOWN*5 OK           # PLA Silk (after Basic, Matte Basic, Rapido, Matte, Metal); back on config, cursor on Material
 DOWN OK DOWN*17 OK  # Color -> Red (code 18); cursor on Color
 shot:cfg-silk-red   # expect: Material "PLA Silk ...", Color "Red ..." selected, Maker "QIDI >" (list scrolled, Printer row off screen)
 DOWN DOWN OK        # Write Tag
 wait:2
 shot:write-silk-red # expect: "Success!", "Written!" and "PLA Silk / Red"
 BACK
-shot:cfg-after-write # expect: cursor on Color, not on Write Tag
+shot:cfg-after-write # expect: cursor on Write Tag (the row that opened Write)
 BACK DOWN OK        # menu -> Read Tag
 wait:2
 shot:read-silk-red  # expect: "Material: PLA Silk", "Color: Red", "Mfr: QIDI"; buttons Retry and Edit & Write
 
 # Code known to Q2 but not to Plus4: write PA12-CF (27 on Q2), read with Plus4
-BACK OK             # menu -> Write Tag; cursor on Color
-UP OK DOWN*3 OK     # Material -> PA / Nylon (Q2: UltraPA, PA-CF, UltraPA-CF25, PA12-CF, ...)
+BACK OK             # menu -> Write Tag; fresh entry, cursor on Printer
+DOWN OK DOWN*3 OK   # Material -> PA / Nylon (Q2: UltraPA, PA-CF, UltraPA-CF25, PA12-CF, ...)
 DOWN*3 OK           # PA12-CF
 shot:cfg-pa12       # expect: Printer "Q2 >", Material "PA12-CF ...", Color "Red ..."
 DOWN*3 OK           # Write Tag
 wait:2
 shot:write-pa12     # expect: "Success!", "PA12-CF / Red"
-BACK UP RIGHT RIGHT # config -> Printer -> Plus4
-shot:cfg-plus4      # expect: Printer "< Plus4", Material reset to "PLA ..." (no PA12-CF row for code 27 on Plus4)
+BACK UP*4 RIGHT RIGHT # config (cursor on Write Tag) -> Printer -> Plus4
+shot:cfg-plus4      # expect: Printer "< Plus4", Material reset to "PLA Basic ..." (no PA12-CF row for code 27 on Plus4)
 BACK DOWN OK        # menu -> Read Tag
 wait:2
 shot:read-unknown   # expect: "Material: #27", "Color: Red", "Mfr: QIDI"; only the Retry button, no Edit & Write
