@@ -14,7 +14,8 @@ Flipper Zero app for reading and writing NFC tags used by the [QIDI Box](https:/
 
 ## What it does
 
-- **Read** — hold the Flipper near a QIDI Box spool tag and see material, color, and manufacturer
+- **Read** — hold the Flipper near a QIDI Box spool tag and see its UID, material, color and
+  manufacturer
 - **Write** — pick printer / material / color / maker, then write your own tag
 
 The tag stores only numeric codes, and each printer model maps them to names with its own table,

@@ -18,7 +18,7 @@ start:/ext/apps/NFC/flipbox.fap
 
 shot:menu                 # expect: main menu, Write Tag selected
 DOWN OK wait:2
-shot:read-result          # expect: Material: PLA Silk, Color: Red, Mfr: QIDI; Retry / Edit & Write
+shot:read-result          # expect: UID, Mat: PLA Silk, Color: Red, Mfr: QIDI (bold labels); Retry / Edit & Write
 RIGHT
 shot:write-cfg            # expect: prefilled config, Printer "Q2 >" selected, Material PLA Silk, Color Red
 DOWN OK DOWN*3 OK DOWN*4

@@ -55,6 +55,7 @@ typedef struct {
 
     // last read result (for display in popup)
     QidiTagData last_read;
+    NfcTagUid   last_uid;
     bool        last_read_valid;
 
     char text_buf[128];

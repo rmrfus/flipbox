@@ -33,6 +33,7 @@ static void flipbox_worker_cb(NfcWorkerResult result, void* context) {
     switch(result.event) {
     case NfcWorkerEventReadSuccess:
         app->last_read       = result.tag_data;
+        app->last_uid        = result.uid;
         app->last_read_valid = true;
         ev = FlipBoxCustomEventReadSuccess;
         break;

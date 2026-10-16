@@ -83,7 +83,9 @@ scenes/
 Thread is started in `nfc_worker_start()` and runs for app lifetime.
 Scene calls `nfc_worker_read()` / `nfc_worker_write()` → posts a request → thread picks it up →
 calls `mf_classic_poller_sync_read_block` / `mf_classic_poller_sync_write_block` → fires user
-callback → `view_dispatcher_send_custom_event`.
+callback → `view_dispatcher_send_custom_event`. A read first runs `iso14443_3a_poller_sync_read`
+for the UID (`NfcWorkerResult.uid` → `app->last_uid`); without a tag it fails there, before any
+login attempt.
 
 Auth keys tried in order: primary D3:F7:D3:F7:D3:F7, then factory default FF:FF:FF:FF:FF:FF.
 
@@ -136,8 +138,11 @@ resets to the printer's first material.
   from writing.
 - Write flow: Menu → WriteCfg → MaterialGroup → MaterialSelect → (back to WriteCfg via
   `scene_manager_search_and_switch_to_previous_scene`) → ColorSelect → Write
-- Read result offers "Edit & Write" only when material and color are both in the selected
-  printer's table; editing would otherwise silently replace the unknown code.
+- Read result shows UID / Mat / Color / Mfr with bold labels, in a text box that stops above the
+  button row. Labels are short so the longest names ("Support For PET/PA", "Yellow-Green", a
+  7-byte UID) fit one line each (checked on device). It offers "Edit & Write" only when material
+  and color are both in the selected printer's table; editing would otherwise silently replace
+  the unknown code.
 - `scene_manager_search_and_switch_to_previous_scene(sm, FlipBoxSceneWriteCfg)` skips the
   group scene when returning from material select — user lands directly on WriteCfg.
 
@@ -173,6 +178,9 @@ device's API major; build with the matching SDK (see the CI matrix for the zip U
   - OFW 1.4.3 / 1.5.1-rc (source only, not checked on device): plain `canvas_draw_str_aligned`,
     no clipping or scrolling, so a long value can spill past its column.
 - Flipper display font is ASCII-only — no Unicode
+- Inline `\e#bold\e#` / `\e*mono\e*` markup works only in `widget_add_text_box_element`
+  (and text scroll), not in `widget_add_string_multiline_element`. A text box drops lines that
+  don't fit its height without any `...`, and wraps long lines, mid-word with the bold font.
 - In write_cfg: `...` suffix = opens submenu, `>` = executes action (space before `...`: `"%s ..."`)
 - CI pins one SDK per API major (`matrix.include` in `.github/workflows/build.yml`, fetched with
   `ufbt update --hw-target=f7 --url=...`; URL mode requires `--hw-target`). Bump `sdk` there when

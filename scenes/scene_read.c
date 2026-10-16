@@ -8,6 +8,16 @@ static const char* name_or_code(const char* name, uint8_t code, char* buf, size_
     return buf;
 }
 
+// "A0 73 2C 36" as the NFC app shows it; longer UIDs drop the spaces to fit
+// one 128 px line
+static void uid_to_str(const NfcTagUid* uid, char* buf, size_t size) {
+    size_t pos = 0;
+    buf[0] = '\0';
+    for(uint8_t i = 0; i < uid->len && pos < size; i++) {
+        pos += snprintf(buf + pos, size - pos, (i && uid->len <= 4) ? " %02X" : "%02X", uid->data[i]);
+    }
+}
+
 static void read_btn_cb(GuiButtonType type, InputType input_type, void* context) {
     if(input_type != InputTypeShort) return;
     FlipBoxApp* app = context;
@@ -38,18 +48,23 @@ bool flipbox_scene_read_on_event(void* context, SceneManagerEvent event) {
             const QidiTagData* d = &app->last_read;
             const char* mat_name = qidi_material_name(app->printer, d->material_code);
             const char* col_name = qidi_color_name(d->color_code);
-            char mat[8], col[8], mfr[8];
+            char mat[8], col[8], mfr[8], uid[3 * ISO14443_3A_MAX_UID_SIZE];
+            uid_to_str(&app->last_uid, uid, sizeof(uid));
+            // Short labels keep the longest names ("Support For PET/PA") on one line
             snprintf(
                 app->text_buf, sizeof(app->text_buf),
-                "Material: %s\nColor: %s\nMfr: %s",
+                "\e#UID:\e# %s\n\e#Mat:\e# %s\n\e#Color:\e# %s\n\e#Mfr:\e# %s",
+                uid,
                 name_or_code(mat_name, d->material_code, mat, sizeof(mat)),
                 name_or_code(col_name, d->color_code, col, sizeof(col)),
                 name_or_code(
                     qidi_mfr_name(d->manufacturer_code), d->manufacturer_code, mfr, sizeof(mfr)));
 
             widget_reset(app->widget);
-            widget_add_string_multiline_element(
-                app->widget, 64, 28, AlignCenter, AlignCenter, FontSecondary, app->text_buf);
+            // Text box, not multiline string: only it takes the \e# bold markup.
+            // The height stops above the button row
+            widget_add_text_box_element(
+                app->widget, 0, 0, 128, 52, AlignCenter, AlignCenter, app->text_buf, true);
             widget_add_button_element(
                 app->widget, GuiButtonTypeLeft, "Retry", read_btn_cb, app);
             // Editing would silently replace a code the selected printer's

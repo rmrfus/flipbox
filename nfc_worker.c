@@ -4,6 +4,7 @@
 #include <lib/nfc/nfc.h>
 #include <lib/nfc/protocols/mf_classic/mf_classic.h>
 #include <lib/nfc/protocols/mf_classic/mf_classic_poller_sync.h>
+#include <lib/nfc/protocols/iso14443_3a/iso14443_3a_poller_sync.h>
 
 #define TAG        "FlipBox_NFC"
 #define STACK_SIZE (2 * 1024)
@@ -45,7 +46,18 @@ static bool worker_is_current(NfcWorker* w, uint32_t generation) {
     return current;
 }
 
-static bool do_read(NfcWorker* w, uint32_t generation, QidiTagData* out) {
+static bool do_read(NfcWorker* w, uint32_t generation, NfcWorkerResult* out) {
+    // Activation alone gives the UID, and without a tag it fails before any
+    // login attempt
+    Iso14443_3aData iso = {0};
+    Iso14443_3aError iso_err = iso14443_3a_poller_sync_read(w->nfc, &iso);
+    if(iso_err != Iso14443_3aErrorNone || !worker_is_current(w, generation)) {
+        FURI_LOG_D(TAG, "No tag: err=%d", iso_err);
+        return false;
+    }
+    out->uid.len = iso.uid_len;
+    memcpy(out->uid.data, iso.uid, iso.uid_len);
+
     MfClassicBlock block = {0};
     MfClassicKey key = {0};
     MfClassicError err;
@@ -58,11 +70,11 @@ static bool do_read(NfcWorker* w, uint32_t generation, QidiTagData* out) {
     }
 
     if(err == MfClassicErrorNone) {
-        out->material_code     = block.data[0];
-        out->color_code        = block.data[1];
-        out->manufacturer_code = block.data[2];
+        out->tag_data.material_code     = block.data[0];
+        out->tag_data.color_code        = block.data[1];
+        out->tag_data.manufacturer_code = block.data[2];
         FURI_LOG_I(TAG, "Read OK: mat=0x%02X col=0x%02X mfr=0x%02X",
-            out->material_code, out->color_code, out->manufacturer_code);
+            block.data[0], block.data[1], block.data[2]);
         return true;
     }
 
@@ -118,7 +130,7 @@ static int32_t worker_thread(void* arg) {
 
         NfcWorkerResult ev = {0};
         if(cmd == WorkerCmdRead) {
-            bool ok  = do_read(w, generation, &ev.tag_data);
+            bool ok  = do_read(w, generation, &ev);
             ev.event = ok ? NfcWorkerEventReadSuccess : NfcWorkerEventReadFail;
         } else {
             bool ok  = do_write(w, generation, &data);

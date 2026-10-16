@@ -2,6 +2,7 @@
 
 #include "qidi_tag.h"
 #include <lib/nfc/nfc.h>
+#include <lib/nfc/protocols/iso14443_3a/iso14443_3a.h>
 
 typedef enum {
     NfcWorkerEventReadSuccess,
@@ -11,8 +12,14 @@ typedef enum {
 } NfcWorkerEvent;
 
 typedef struct {
+    uint8_t data[ISO14443_3A_MAX_UID_SIZE];
+    uint8_t len;
+} NfcTagUid;
+
+typedef struct {
     NfcWorkerEvent event;
     QidiTagData    tag_data; // valid on ReadSuccess
+    NfcTagUid      uid;      // valid on ReadSuccess
 } NfcWorkerResult;
 
 typedef void (*NfcWorkerCallback)(NfcWorkerResult result, void* context);
